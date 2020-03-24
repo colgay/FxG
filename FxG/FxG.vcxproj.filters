@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="HamSandwich">
+      <UniqueIdentifier>{11634157-09e5-4e97-b276-32c8fe40059b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="SDK">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Trampolines.h">
+      <Filter>HamSandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="hooklist.h">
+      <Filter>HamSandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="hook_callbacks.h">
+      <Filter>HamSandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="hook.h">
+      <Filter>HamSandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="HamSandwich.h">
+      <Filter>HamSandwich</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMode.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ZombieAttributes.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AmxxApi.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CstrikeDatas.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ham_const.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Human.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerClass.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerHandler.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="WrappedEntity.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Zombie.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\amxxmodule.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\moduleconfig.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="CLogEvent.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CEvent.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Human.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Module.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Zombie.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerHandler.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerClassHelper.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="offsets.h">
+      <Filter>HamSandwich</Filter>
+    </ClCompile>
+    <ClCompile Include="config_parser.cpp">
+      <Filter>HamSandwich</Filter>
+    </ClCompile>
+    <ClCompile Include="HamSandwich.cpp">
+      <Filter>HamSandwich</Filter>
+    </ClCompile>
+    <ClCompile Include="AmxxApi.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMode.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk\amxxmodule.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="CLogEvent.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="CEvent.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
