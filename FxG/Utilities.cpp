@@ -1,7 +1,8 @@
 #include "Utilities.h"
-
 #include "extdll.h"
 #include "meta_api.h"
+
+HLTypeConversion g_TypeConversion;
 
 void UTIL_HudMessage(edict_t* pEntity, const hudtextparms_t& textparms, const char* pMessage)
 {
@@ -178,3 +179,52 @@ void UTIL_ClientPrintAll(int msg_dest, const char* msg_name, const char* param1,
 
 	MESSAGE_END();
 }
+
+
+edict_t* UTIL_FindEntityByString(edict_t* pStartEntity, const char* szKeyword, const char* szValue)
+{
+	edict_t* pentEntity;
+
+	if (pStartEntity)
+		pentEntity = pStartEntity;
+	else
+		pentEntity = NULL;
+
+	pentEntity = FIND_ENTITY_BY_STRING(pentEntity, szKeyword, szValue);
+
+	if (!FNullEnt(pentEntity))
+		return pentEntity;
+
+	return NULL;
+}
+
+void UTIL_SendAudio(edict_t* pEnt, int sender, const char* pszAudio, int pitch)
+{
+	static int msgSendAudio = 0;
+	if (msgSendAudio == 0)
+		msgSendAudio = GET_USER_MSG_ID(PLID, "SendAudio", 0);
+
+	MESSAGE_BEGIN((pEnt == nullptr) ? MSG_BROADCAST : MSG_ONE_UNRELIABLE, msgSendAudio, nullptr, pEnt);
+	WRITE_BYTE(sender);
+	WRITE_STRING(pszAudio);
+	WRITE_SHORT(pitch);
+	MESSAGE_END();
+}
+
+edict_t* UTIL_FindEntityByClassname(edict_t* pStartEntity, const char* szName)
+{
+	return UTIL_FindEntityByString(pStartEntity, "classname", szName);
+}
+/*
+void UTIL_LogPrintf(const char* fmt, ...)
+{
+	va_list			argptr;
+	static char		string[1024];
+
+	va_start(argptr, fmt);
+	vsprintf(string, fmt, argptr);
+	va_end(argptr);
+
+	// Print to server console
+	ALERT(at_logged, "%s", string);
+}*/

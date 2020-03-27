@@ -1,6 +1,7 @@
 #pragma once
 
-#include "WrappedEntity.h"
+class WrappedEntity;
+class Player;
 
 class PlayerClass
 {
@@ -25,6 +26,7 @@ public:
 
 	virtual void OnRespawn() {}
 	virtual void OnThink() {}
+	virtual int OnTakeDamage(WrappedEntity* pInflictor, WrappedEntity* pAttacker, float damage, int damageType) {}
 	virtual void OnKilled(WrappedEntity* pKiller) {}
 
 protected:

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Player.h"
-#include "PlayerHandler.h"
+#include "PlayerClass.h"
 
 class Zombie : public PlayerClass
 {

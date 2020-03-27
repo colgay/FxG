@@ -1,4 +1,5 @@
 #include "Timer.h"
+
 #include "amxxmodule.h"
 
 #include <algorithm>
@@ -13,6 +14,8 @@ Timer::Timer(float delay, int id, TimerCallback_t callback, const TimerParam_t &
     m_params = params;
     m_id = id;
     m_repeated = repeated;
+    m_deleted = false;
+    m_executing = false;
 }
 
 Timer::Timer(float delay, int id, TimerCallback_t callback, bool repeated)
@@ -22,9 +25,11 @@ Timer::Timer(float delay, int id, TimerCallback_t callback, bool repeated)
     m_pFunction = callback;
     m_id = id;
     m_repeated = repeated;
+    m_deleted = false;
+    m_executing = false;
 }
 
-bool Timer::IsExecuteAble() const
+bool Timer::SholudExecuteNow() const
 {
     return gpGlobals->time >= m_startTime + m_delay;
 }
@@ -41,7 +46,7 @@ Timer* TimerManager::Create(float delay, int id, TimerCallback_t callback, const
     if (delay < 0.1) // performance
         delay = 0.1;
 
-    if (this->FindById(id) != m_timers.end())
+    if (this->FindById(id, m_timers.begin()) != m_timers.end())
     {
         MF_Log("Cannot create timer, timer id(%d) exists.", id);
         return nullptr;
@@ -56,7 +61,7 @@ Timer* TimerManager::Create(float delay, int id, TimerCallback_t callback, bool 
     if (delay < 0.1) // performance
         delay = 0.1;
 
-    if (this->FindById(id) != m_timers.end())
+    if (this->FindById(id, m_timers.begin()) != m_timers.end())
     {
         MF_Log("Cannot create timer, timer id(%d) exists.", id);
         return nullptr;
@@ -64,6 +69,16 @@ Timer* TimerManager::Create(float delay, int id, TimerCallback_t callback, bool 
 
     m_timers.push_back(new Timer(delay, id, callback, repeated));
     return m_timers.back();
+}
+
+Timer* TimerManager::Create(float delay, int id, TimerCallback_t callback)
+{
+    return this->Create(delay, id, callback, false);
+}
+
+Timer* TimerManager::Create(float delay, int id, TimerCallback_t callback, const TimerParam_t& params)
+{
+    return this->Create(delay, id, callback, params, false);
 }
 
 void TimerManager::Remove(Timer *pTimer)
@@ -92,7 +107,7 @@ void TimerManager::Remove(std::vector<Timer*>::const_iterator iter)
 
 void TimerManager::Remove(int id)
 {
-    auto iter = this->FindById(id);
+    auto iter = this->FindById(id, m_timers.begin());
     if (iter == m_timers.end())
         return;
 
@@ -114,17 +129,20 @@ void TimerManager::Executes()
     {
         for (auto it = m_timers.begin(); it != m_timers.end(); )
         {
-            if ((*it)->IsExecuteAble())
+            if ((*it)->SholudExecuteNow())
             {
-                (*it)->Execute();
-                
-                if ((*it)->IsRepeated() && !(*it)->IsDeleted())
+                if (!(*it)->IsDeleted())
                 {
-                    (*it)->SetStartTime(gpGlobals->time);
-                    continue;
+                    (*it)->Execute();
+
+                    if ((*it)->IsRepeated())
+                    {
+                        (*it)->SetStartTime(gpGlobals->time);
+                        continue;
+                    }
                 }
 
-                SERVER_PRINT(UTIL_VarArgs("Timer (id:%d) deleted.", (*it)->GetId()));
+                SERVER_PRINT(UTIL_VarArgs("Timer (id:%d) deleted.\n", (*it)->GetId()));
                 delete (*it);
                 it = m_timers.erase(it);
             }
@@ -155,10 +173,10 @@ Timer* TimerManager::At(unsigned int index) const
     return m_timers.at(index);
 }
 
-std::vector<Timer*>::const_iterator TimerManager::FindById(int id) const
+std::vector<Timer*>::const_iterator TimerManager::FindById(int id, std::vector<Timer*>::const_iterator begin) const
 {
     auto iter = std::find_if(
-        m_timers.begin(), m_timers.end(),
+        begin, m_timers.end(),
         [id](const Timer* ptr) { return ptr->GetId() == id; });
 
     return iter;

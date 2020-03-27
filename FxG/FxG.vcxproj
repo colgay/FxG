@@ -93,7 +93,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\sdk;$(AMXX)\public;$(AMXX)\public\amtl;$(AMXX)\third_party;$(AMXX)\third_party\hashing;$(HLSDK)\common;$(HLSDK)\dlls;$(HLSDK)\engine;$(HLSDK)\pm_shared;$(HLSDK)\public;$(METAMOD)\metamod;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\sdk;$(AMXX)\public;$(AMXX)\public\amtl;$(AMXX)\third_party;$(AMXX)\third_party\hashing;$(AMXX)\public\memtools;$(HLSDK)\common;$(HLSDK)\dlls;$(HLSDK)\engine;$(HLSDK)\pm_shared;$(HLSDK)\public;$(METAMOD)\metamod;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -124,7 +124,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\sdk;$(AMXX)\public;$(AMXX)\public\amtl;$(AMXX)\third_party;$(AMXX)\third_party\hashing;$(HLSDK)\common;$(HLSDK)\dlls;$(HLSDK)\engine;$(HLSDK)\pm_shared;$(HLSDK)\public;$(METAMOD)\metamod;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\sdk;$(AMXX)\public;$(AMXX)\public\amtl;$(AMXX)\third_party;$(AMXX)\third_party\hashing;$(AMXX)\public\memtools;$(HLSDK)\common;$(HLSDK)\dlls;$(HLSDK)\engine;$(HLSDK)\pm_shared;$(HLSDK)\public;$(METAMOD)\metamod;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
@@ -152,12 +152,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\CDetour\asm\asm.c" />
+    <ClCompile Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\CDetour\detours.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\MemoryUtils.cpp" />
     <ClCompile Include="AmxxApi.cpp" />
     <ClCompile Include="CEvent.cpp" />
     <ClCompile Include="CLogEvent.cpp" />
     <ClCompile Include="config_parser.cpp" />
     <ClCompile Include="GameMode.cpp" />
+    <ClCompile Include="GameRules.cpp" />
+    <ClCompile Include="Hacks.cpp" />
     <ClCompile Include="HamSandwich.cpp" />
+    <ClCompile Include="InfectionMode.cpp" />
     <ClCompile Include="offsets.h" />
     <ClCompile Include="Human.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -185,17 +191,24 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\CDetour\asm\asm.h" />
+    <ClInclude Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\CDetour\detourhelpers.h" />
+    <ClInclude Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\CDetour\detours.h" />
+    <ClInclude Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\MemoryUtils.h" />
     <ClInclude Include="AmxxApi.h" />
     <ClInclude Include="CEvent.h" />
     <ClInclude Include="CLogEvent.h" />
     <ClInclude Include="CstrikeDatas.h" />
     <ClInclude Include="GameMode.h" />
+    <ClInclude Include="GameRules.h" />
+    <ClInclude Include="Hacks.h" />
     <ClInclude Include="HamSandwich.h" />
     <ClInclude Include="ham_const.h" />
     <ClInclude Include="hook.h" />
     <ClInclude Include="hooklist.h" />
     <ClInclude Include="hook_callbacks.h" />
     <ClInclude Include="Human.h" />
+    <ClInclude Include="InfectionMode.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerClass.h" />
     <ClInclude Include="PlayerHandler.h" />
@@ -206,7 +219,6 @@
     <ClInclude Include="sdk\moduleconfig.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="Zombie.h" />
-    <ClInclude Include="ZombieAttributes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

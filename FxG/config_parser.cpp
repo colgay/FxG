@@ -11,12 +11,16 @@
 // Ham Sandwich Module
 //
 
-#include <amxxmodule.h>
+#include "amxxmodule.h"
+#include "Hacks.h"
 #include "ham_const.h"
 #include "hooklist.h"
 #include "offsets.h"
+#include "GameRules.h"
+#include <amtl/am-platform.h>
 
 IGameConfig* g_pCommonConfig;
+IGameConfig* g_pMainConfig;
 IGameConfigManager* g_pConfigManager;
 
 int ReadConfig(void)
@@ -26,6 +30,14 @@ int ReadConfig(void)
 	g_pConfigManager = MF_GetConfigManager();
 
 	char error[256] = "";
+
+	if (!g_pConfigManager->LoadGameConfigFile("modules.games", &g_pMainConfig, error, sizeof(error)) && *error)
+	{
+		MF_Log("Could not read module.games gamedata: %s", error);
+		return -1;
+	}
+
+	InitializeHacks();
 
 	if (!g_pConfigManager->LoadGameConfigFile("common.games", &g_pCommonConfig, error, sizeof error))
 	{
@@ -45,6 +57,20 @@ int ReadConfig(void)
 		Offsets.SetBase(value.fieldOffset);
 	}
 
+	void* address = nullptr;
+
+	if (!g_pCommonConfig->GetAddress("g_pGameRules", &address) || !address)
+	{
+		MF_Log("g_pGameRules address could not be found.");
+		return -1;
+	}
+
+#if defined(KE_WINDOWS)
+	g_GameRules.Init(*reinterpret_cast<void***>(address));
+#else
+	g_GameRules.Init(reinterpret_cast<void**>(address));
+#endif
+
 	for (auto index = 0; index < HAM_LAST_ENTRY_DONT_USE_ME_LOL; ++index)
 	{
 		if (g_pCommonConfig->GetOffset(hooklist[index].name, &value))
@@ -57,4 +83,12 @@ int ReadConfig(void)
 	}
 
 	return 1;
+}
+
+void CloseConfigFiles()
+{
+	g_pConfigManager->CloseGameConfigFile(g_pMainConfig);
+	g_pConfigManager->CloseGameConfigFile(g_pCommonConfig);
+
+	ShutdownHacks();
 }

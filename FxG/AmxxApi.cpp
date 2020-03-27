@@ -1,10 +1,15 @@
 #include "amxxmodule.h"
-#include "HLTypeConversion.h"
+#include "AmxxApi.h"
 
-extern HLTypeConversion g_TypeConversion;
+#include "Utilities.h"
+
+#include "Player.h"
+#include "PlayerHandler.h"
 
 int g_fwd_SetPlayerModel;
 int g_fwd_ResetPlayerModel;
+
+AMX_NATIVE_INFO ModuleNatives[];
 
 void RegisterForwards()
 {
@@ -29,3 +34,34 @@ void CS_ResetPlayerModel(edict_t* pPlayer)
 
 	MF_ExecuteForward(g_fwd_ResetPlayerModel, index);
 }
+
+void RegisterNatives()
+{
+	MF_AddNatives(ModuleNatives);
+}
+
+static cell AMX_NATIVE_CALL tig_is_player_zombie(AMX* amx, cell* params)
+{
+	int playerIndex = params[1];
+
+	if (!GetPlayerHandler()->HasPlayer(playerIndex))
+	{
+		MF_LogError(amx, AMX_ERR_NATIVE, "player id (%d) is invalid", playerIndex);
+		return 0;
+	}
+
+	Player* pPlayer = GetPlayerHandler()->GetPlayer(playerIndex);
+	if (pPlayer->HasClass())
+	{
+		MF_LogError(amx, AMX_ERR_NATIVE, "player (%d) has no class", playerIndex);
+		return 0;
+	}
+
+	return static_cast<cell>(pPlayer->GetClass()->IsZombie());
+}
+
+AMX_NATIVE_INFO ModuleNatives[] =
+{
+	{"tig_is_player_zombie", tig_is_player_zombie},
+	{nullptr, nullptr}
+};

@@ -1,9 +1,6 @@
 #pragma once
 
-#include "extdll.h"
 #include "PlayerHandler.h"
-
-class Player;
 
 //extern PlayerHandler* g_pPlayers;
 
@@ -21,6 +18,9 @@ public:
 
 	entvars_t* GetPev() { return &m_pEdict->v; }
 	const entvars_t* GetPev() const { return &m_pEdict->v; }
+
+	edict_t* GetEdict() { return m_pEdict; }
+	const edict_t* GetEdict() const { return m_pEdict; }
 
 private:
 	edict_t* m_pEdict;

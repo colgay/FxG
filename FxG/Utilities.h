@@ -1,10 +1,13 @@
 #pragma once
 
-#include "extdll.h"
-#include "mutil.h"
+#include "HLTypeConversion.h"
+
+extern HLTypeConversion g_TypeConversion;
 
 #define DMG_BURN (1 << 3)	// heat burned
 #define	SF_NORESPAWN (1 << 30)
+
+void UTIL_SendAudio(edict_t* pEnt, int sender, const char* pszAudio, int pitch);
 
 void UTIL_IntToString(int value, char* output);
 
@@ -21,3 +24,9 @@ void UTIL_ClientPrintAll(int msg_dest, const char* msg_name, const char* param1,
 void UTIL_HudMessage(edict_t* pEntity, const hudtextparms_t& textparms, const char* pMessage);
 
 void UTIL_HudMessageAll(const hudtextparms_t& textparms, const char* pMessage);
+
+edict_t* UTIL_FindEntityByString(edict_t* pStartEntity, const char* szKeyword, const char* szValue);
+
+edict_t* UTIL_FindEntityByClassname(edict_t* pStartEntity, const char* szName);
+
+//void UTIL_LogPrintf(const char* fmt, ...);

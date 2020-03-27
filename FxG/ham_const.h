@@ -549,6 +549,9 @@ enum
 	Ham_SC_Player_EnteredObserver,
 	Ham_SC_Player_LeftObserver,
 	Ham_SC_Player_IsObserver,
+	
+	GR_CheckWinConditions,
+	GR_GameRules_Think,
 
 	HAM_LAST_ENTRY_DONT_USE_ME_LOL
 };

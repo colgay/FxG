@@ -7,9 +7,8 @@
 // Additional exceptions apply. For full license details, see LICENSE.txt or visit:
 //     https://alliedmods.net/amxmodx-license
 
-#include "CLogEvent.h"
-
 #include "amxxmodule.h"
+#include "CLogEvent.h"
 
 // *****************************************************
 // class LogEventsMngr
@@ -168,11 +167,10 @@ void LogEventsMngr::parseLogString()
 	}
 }
 
-/*
 void LogEventsMngr::CLogEvent::setForwardState(ForwardState state)
 {
 	m_State = state;
-}*/
+}
 
 LogEventsMngr::CLogEvent* LogEventsMngr::registerLogEvent(void (*func)(void), int pos)
 {
@@ -203,10 +201,10 @@ void LogEventsMngr::executeLogEvents()
 
 	for (CLogEvent* a = logevents[logArgc]; a; a = a->next)
 	{
-		/*if (a->m_State != FSTATE_ACTIVE)
+		if (a->m_State != FSTATE_ACTIVE)
 		{
 			continue;
-		}*/
+		}
 
 		valid = true;
 

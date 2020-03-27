@@ -16,7 +16,7 @@
 
 #include <string.h>
 
-#include "amxxmodule.h"
+#include "IGameConfigs.h"
 #include "ham_const.h"
 
 #define GET_OFFSET(classname, member, variable) \

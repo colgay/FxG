@@ -155,6 +155,16 @@ enum WeaponState
 	WPNSTATE_SHIELD_DRAWN = (1 << 5),
 };
 
+enum JoinState
+{
+	JOINED,
+	SHOWLTEXT,
+	READINGLTEXT,
+	SHOWTEAMSELECT,
+	PICKINGTEAM,
+	GETINTOGAME
+};
+
 /**
  * M4A1 animations
  */

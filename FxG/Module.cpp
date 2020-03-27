@@ -1,42 +1,48 @@
 #include "amxxmodule.h"
-#include "Player.h"
-#include "PlayerHandler.h"
-#include "Zombie.h"
+
+//#include <map>
+//#include <string>
+
+#include "Hacks.h"
 #include "offsets.h"
 #include "hook.h"
 #include "HamSandwich.h"
-#include "Utilities.h"
-#include "AmxxApi.h"
 #include "CEvent.h"
 #include "CLogEvent.h"
 #include "Timer.h"
+#include "Utilities.h"
+#include "AmxxApi.h"
+#include "Player.h"
+#include "PlayerHandler.h"
+#include "WrappedEntity.h"
+//#include "Human.h"
+#include "Zombie.h"
+#include "GameRules.h"
 
-#include <vector>
-#include <string>
-#include <any>
-
-#include <HLTypeConversion.h>
 #include <amtl/am-string.h>
 #include <amtl/am-vector.h>
-
-HLTypeConversion g_TypeConversion;
 
 OffsetManager Offsets;
 
 extern ke::Vector<Hook*> g_Hooks[HAM_LAST_ENTRY_DONT_USE_ME_LOL];
 
-std::vector<std::pair<std::string, BasePlayerClassHelper*>> g_PlayerClassVector;
+//std::map<std::string, BasePlayerClassHelper*> g_PlayerClassHelpers;
+//std::map<std::string, BaseGameModeHelper*> g_GameModeHelpers;
+
+//std::vector<std::pair<std::string, BasePlayerClassHelper*>> g_PlayerClassVector;
+//std::vector<std::pair<std::string, BaseGameModeHelper*>> g_GameModeVector;
 
 int ReadConfig(void);
+void CloseConfigFiles(void);
 int OnPlayerTakeDamage(Hook* hook, void* pthis, entvars_t* inflictor, entvars_t* attacker, float damage, int damagebits);
 void OnWeaponTouch(Hook* hook, void* pthis, void* pother);
 int OnKnifeDeploy(Hook* hook, void* pthis);
 void OnPlayerSpawn(Hook* hook, void* pthis);
 void OnPlayerResetMaxspeed(Hook* hook, void* pthis);
+void OnCheckWinConditions(Hook* hook, void* pthis);
+void OnGameRulesThink(Hook* hook, void* pthis);
 void OnRoundStart(void);
 void OnNewRound(int);
-void OnGameCountDown(Timer* pTimer);
-void OnGameModeStart();
 
 void OnAmxxAttach()
 {
@@ -57,12 +63,14 @@ void OnAmxxAttach()
 void OnAmxxDetach()
 {
 	g_logevents.clearLogEvents();
+	g_events.clearEvents();
+	g_TimerManager.Clean();
+
+	CloseConfigFiles();
 }
 
 void ServerActivate_Post(edict_t* pEdictList, int edictCount, int clientMax)
 {
-	PrecacheZombie();
-
 	RegisterEvent("HLTV", &OnNewRound, "a", 2, "1=0", "2=0");
 	RegisterLogEvent(&OnRoundStart, 2, 1, "1=Round_Start");
 
@@ -71,6 +79,13 @@ void ServerActivate_Post(edict_t* pEdictList, int edictCount, int clientMax)
 	RegisterHam(Ham_Item_Deploy, "weapon_knife", reinterpret_cast<void*>(OnKnifeDeploy));
 	RegisterHam(Ham_Spawn, "player", reinterpret_cast<void*>(OnPlayerSpawn));
 	RegisterHam(Ham_CS_Player_ResetMaxSpeed, "player", reinterpret_cast<void*>(OnPlayerResetMaxspeed));
+	
+	RegisterGameRules(GR_CheckWinConditions, reinterpret_cast<void*>(OnCheckWinConditions));
+	RegisterGameRules(GR_GameRules_Think, reinterpret_cast<void*>(OnGameRulesThink));
+
+	ToggleHooks(true);
+
+	g_GameRules.OnServerActivated();
 }
 
 void ServerDeactivate_Post()
@@ -78,10 +93,14 @@ void ServerDeactivate_Post()
 	g_events.clearEvents();
 	g_logevents.clearLogEvents();
 	g_TimerManager.Clean();
+
+	ToggleHooks(false);
 }
 
 void OnPluginsLoaded()
 {
+	PrecacheZombie();
+
 	g_TypeConversion.init();
 
 	RegisterForwards();
@@ -111,8 +130,22 @@ void ClientKill(edict_t* pEnt)
 	RETURN_META(MRES_IGNORED);
 }
 
+void ClientUserInfoChanged_Post(edict_t* pEntity, char* infobuffer)
+{
+	int index = g_TypeConversion.edict_to_id(pEntity);
+
+	if (MF_IsPlayerBot(index) && GetPlayerHandler()->HasPlayer(index) && GetPlayerHandler()->GetPlayer(index)->GetEdict() == nullptr)
+	{
+		// Support for bot
+		ClientPutInServer(pEntity);
+	}
+
+	RETURN_META(MRES_IGNORED);
+}
+
 void ClientPutInServer(edict_t* pEnt)
 {
+	MF_Log("!!!!!!!!!!!!!!! PLAYER ClientPutInServer !!!!!!!!!!!!!!!!\n");
 	GetPlayerHandler()->PutInServer(pEnt);
 	RETURN_META(MRES_IGNORED);
 }
@@ -320,115 +353,31 @@ void C_MessageEnd_Post(void)
 
 void OnRoundStart()
 {
-	SERVER_PRINT("OnRoundStart() called\n");
+	g_GameRules.OnRoundStart();
 }
 
 void OnNewRound(int msg)
 {
-	SERVER_PRINT("OnNewRound() called\n");
-
-	for (int i = 1; i <= gpGlobals->maxClients; i++)
-	{
-		if (!MF_IsPlayerIngame(i))
-			continue;
-
-		Player* pPlayer = GetPlayerHandler()->GetPlayer(i);
-		if (pPlayer != nullptr)
-		{
-			if (pPlayer->GetClass()->IsZombie())
-			{
-				pPlayer->ChangeClass("Human");
-			}
-		}
-	}
-
-	g_TimerManager.Remove(0);
-
-	TimerParam_t params;
-	params.push_back(20);
-	g_TimerManager.Create(1.0, 0, &OnGameCountDown, params, true);
+	g_GameRules.OnRoundRestart();
 }
 
-void OnGameCountDown(Timer* pTimer)
+int DispatchSpawn(edict_t* pent)
 {
-	TimerParam_t &params = pTimer->GetParams();
-	
-	int &count = std::any_cast<int&>(params[0]);
-	if (count > 0)
-	{
-		count--;
-
-		if (count <= 10)
-		{
-			char word[32];
-			UTIL_IntToString(count, word);
-
-			for (int i = 1; i <= gpGlobals->maxClients; i++)
-			{
-				if (MF_IsPlayerIngame(i))
-					CLIENT_COMMAND(g_TypeConversion.id_to_edict(i), "spk fvox/%s\n", word);
-			}
-		}
-
-		hudtextparms_t textparms;
-
-		textparms.r2 = 255;
-		textparms.g2 = 255;
-		textparms.b2 = 250;
-		textparms.r1 = 0;
-		textparms.g1 = 255;
-		textparms.b1 = 0;
-		textparms.x = -1.0;
-		textparms.y = 0.25;
-		textparms.effect = 0;
-		textparms.fxTime = 0.0;
-		textparms.holdTime = 1.0;
-		textparms.fadeinTime = 0.0;
-		textparms.fadeoutTime = 0.5;
-		textparms.channel = 4;
-
-		UTIL_HudMessageAll(textparms, UTIL_VarArgs("Covid-19 coronavirus is spreading (%d)...", count));
-	}
-	else
-	{
-		OnGameModeStart();
-		pTimer->MarkAsDeleted(true);
-	}
-}
-
-void OnGameModeStart()
-{
-	hudtextparms_t textparms;
-
-	textparms.r2 = 255;
-	textparms.g2 = 255;
-	textparms.b2 = 250;
-	textparms.r1 = 0;
-	textparms.g1 = 255;
-	textparms.b1 = 0;
-	textparms.x = -1.0;
-	textparms.y = 0.25;
-	textparms.effect = 0;
-	textparms.fxTime = 0.0;
-	textparms.holdTime = 3.0;
-	textparms.fadeinTime = 1.0;
-	textparms.fadeoutTime = 1.0;
-	textparms.channel = 4;
-
-	UTIL_HudMessageAll(textparms, "The first infection has been started!!");
-
-	for (int i = 1; i <= gpGlobals->maxClients; i++)
-	{
-		if (MF_IsPlayerIngame(i))
-			CLIENT_COMMAND(g_TypeConversion.id_to_edict(i), "spk scientist/scream1\n");
-	}
+	return g_GameRules.OnEntitySpawn(pent);
 }
 
 int OnPlayerTakeDamage(Hook* hook, void* pthis, entvars_t* inflictor, entvars_t* attacker, float damage, int damagebits)
 {
 	int origret;
 
-	SERVER_PRINT(UTIL_VarArgs("OnPlayerTakeDamage(%p, %p, %p, %f, %d)\n", pthis, inflictor, attacker, damage, damagebits));
+	edict_t* pPlayerEnt = g_TypeConversion.cbase_to_edict(pthis);
+
+	Player *pPlayer = GetPlayerHandler()->GetPlayer(pPlayerEnt);
+	if (pPlayer->HasClass())
+	{
+		pPlayer->GetClass()->OnTakeDamage(&WrappedEntity(g_TypeConversion.entvar_to_edict(inflictor)),
+			&WrappedEntity(g_TypeConversion.entvar_to_edict(attacker)), damage, damagebits);
+	}
 
 #if defined(_WIN32)
 	origret = reinterpret_cast<int(__fastcall*)(void*, int, entvars_t*, entvars_t*, float, int)>(hook->func)(pthis, 0, inflictor, attacker, damage, damagebits);
@@ -447,7 +396,7 @@ void OnWeaponTouch(Hook* hook, void* pthis, void* pother)
 	Player* pPlayer = GetPlayerHandler()->GetPlayer(pEdict);
 	if (pPlayer != nullptr)
 	{
-		if (pPlayer->GetClass()->IsZombie())
+		if (pPlayer->HasClass() && pPlayer->GetClass()->IsZombie())
 		{
 			return;
 		}
@@ -479,7 +428,7 @@ int OnKnifeDeploy(Hook* hook, void* pthis)
 	Player* pPlayer = GetPlayerHandler()->GetPlayer(g_TypeConversion.cbase_to_edict(pCBase));
 
 	// Check if owner is a player
-	if (pPlayer != nullptr)
+	if (pPlayer != nullptr && pPlayer->HasClass())
 	{
 		PlayerClass* pPlayerClass = pPlayer->GetClass();
 
@@ -509,13 +458,13 @@ void OnPlayerSpawn(Hook* hook, void* pthis)
 #endif
 
 	int index = g_TypeConversion.cbase_to_id(pthis);
-	if (MF_IsPlayerAlive(index))
+	//if (MF_IsPlayerIngame(index) && MF_IsPlayerAlive(index))
+	if (GetPlayerHandler()->HasPlayer(index) && MF_IsPlayerIngame(index) && MF_IsPlayerAlive(index))
 	{
-		Player* pPlayer = GetPlayerHandler()->GetPlayer(index);
-		if (pPlayer != nullptr)
+		if (GetPlayerHandler()->GetPlayer(index)->HasClass())
 		{
 			SERVER_PRINT("Player::PlayerClass::Become() called\n");
-			pPlayer->GetClass()->Become();
+			GetPlayerHandler()->GetPlayer(index)->GetClass()->Become();
 		}
 	}
 }
@@ -529,11 +478,28 @@ void OnPlayerResetMaxspeed(Hook* hook, void* pthis)
 #endif
 
 	int index = g_TypeConversion.cbase_to_id(pthis);
-	if (MF_IsPlayerAlive(index))
+	if (MF_IsPlayerIngame(index) && MF_IsPlayerAlive(index))
 	{
-		Player* pPlayer = GetPlayerHandler()->GetPlayer(index);
-		pPlayer->GetClass()->SetMaxspeed();
+		// maybe OnPlayerResetMaxSpeed is before PutInServer
+		if (GetPlayerHandler()->GetPlayer(index)->HasClass())
+			GetPlayerHandler()->GetPlayer(index)->GetClass()->SetMaxspeed();
 	}
+}
+
+void OnCheckWinConditions(Hook* hook, void* pthis)
+{
+	g_GameRules.OnCheckWinConditions(pthis);
+}
+
+void OnGameRulesThink(Hook* hook, void* pthis)
+{
+	g_GameRules.OnThink(pthis);
+
+#if defined(_WIN32)
+	reinterpret_cast<void(__fastcall*)(void*, int)>(hook->func)(pthis, 0);
+#elif defined(__linux__) || defined(__APPLE__)
+	reinterpret_cast<void (*)(void*)>(hook->func)(pthis);
+#endif
 }
 
 void StartFrame_Post(void)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "extdll.h"
 #include "PlayerClass.h"
 
 class Player
@@ -8,8 +9,13 @@ public:
 	Player() : m_index(0), m_pEdict(NULL), m_pPlayerClass(nullptr)
 	{}
 
+	~Player();
+
 	void PutInServer(int index);
+	bool IsAlive() const;
 	void Disconnect();
+
+	int GetCurrentWeapon() const;
 
 	int GetIndex() const { return m_index; }
 	edict_t* GetEdict() const { return m_pEdict; }
@@ -40,6 +46,7 @@ public:
 
 	void ResetMaxspeed();
 	
+	bool HasClass() const { return (GetClass() != nullptr); }
 	PlayerClass* GetClass() const { return m_pPlayerClass; }
 	PlayerClass* ChangeClass(const char* pszClassName);
 

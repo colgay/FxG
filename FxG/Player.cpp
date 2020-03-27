@@ -1,13 +1,21 @@
 #include "Player.h"
-#include "offsets.h"
-#include "CstrikeDatas.h"
-#include "AmxxApi.h"
-#include "HamSandwich.h"
 
 #include "amxxmodule.h"
-#include <HLTypeConversion.h>
 
-extern HLTypeConversion g_TypeConversion;
+#include "offsets.h"
+#include "CstrikeDatas.h"
+#include "HamSandwich.h"
+#include "AmxxApi.h"
+#include "Utilities.h"
+
+Player::~Player()
+{
+	if (m_pPlayerClass != nullptr)
+	{
+		delete m_pPlayerClass;
+		m_pPlayerClass = nullptr;
+	}
+}
 
 void Player::PutInServer(int index)
 {
@@ -16,10 +24,20 @@ void Player::PutInServer(int index)
 	this->ChangeClass("Human");
 }
 
+bool Player::IsAlive() const
+{
+	return MF_IsPlayerAlive(m_index);
+}
+
 void Player::Disconnect()
 {
 	m_index = 0;
 	m_pEdict = NULL;
+}
+
+int Player::GetCurrentWeapon() const
+{
+	return MF_GetPlayerCurweapon(m_index);
 }
 
 int Player::GetTeam() const

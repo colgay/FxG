@@ -1,7 +1,5 @@
 #pragma once
 
-#include "extdll.h"
-
 #ifndef MAX_PLAYERS
 #define MAX_PLAYERS 32
 #endif
@@ -11,7 +9,7 @@ class Player;
 class PlayerHandler
 {
 public:
-	PlayerHandler() : m_maxplayers(0), m_pPlayers() {}
+	PlayerHandler() : m_maxplayers(0), m_pPlayers{ 0 } { /* or... ::memset(&m_pPlayers, 0, sizeof(m_pPlayers)) */ }
 	~PlayerHandler();
 
 	void Init(int maxplayers);
@@ -28,6 +26,8 @@ public:
 		return false;
 	}
 
+	template<typename T>
+	bool HasPlayer(T key) { return GetPlayer(key) != nullptr; }
 	Player* GetPlayer(edict_t* pEnt);
 	Player* GetPlayer(int index);
 

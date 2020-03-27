@@ -15,7 +15,7 @@ public:
     Timer(float delay, int id, TimerCallback_t callback, const TimerParam_t &params, bool repeated);
     Timer(float delay, int id, TimerCallback_t callback, bool repeated);
 
-    bool IsExecuteAble() const;
+    bool SholudExecuteNow() const;
     float GetStartedTime() const { return m_startTime; }
     float GetDelay() const { return m_delay; }
     bool IsRepeated() const { return m_repeated; }
@@ -48,7 +48,9 @@ public:
     ~TimerManager() { this->Clean(); }
 
     Timer *Create(float delay, int id, TimerCallback_t callback, const TimerParam_t &params, bool repeated=false);
+    Timer* Create(float delay, int id, TimerCallback_t callback, const TimerParam_t& params);
     Timer* Create(float delay, int id, TimerCallback_t callback, bool repeated=false);
+    Timer* Create(float delay, int id, TimerCallback_t callback);
     void Remove(Timer* pTimer);
     void Remove(std::vector<Timer*>::const_iterator iter);
     void Remove(int id);
@@ -58,7 +60,7 @@ public:
     unsigned int GetIndex(Timer* pTimer) const;
     Timer* At(unsigned int index) const;
 
-    std::vector<Timer*>::const_iterator FindById(int id) const;
+    std::vector<Timer*>::const_iterator FindById(int id, std::vector<Timer*>::const_iterator begin) const;
 
 private:
     std::vector<Timer*> m_timers;

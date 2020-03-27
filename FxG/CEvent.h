@@ -10,8 +10,7 @@
 #ifndef __CEVENTS_H__
 #define __CEVENTS_H__
 
-#include "extdll.h"
-#include "meta_api.h"
+#include "AmxxApi.h"
 #include <amtl/am-autoptr.h>
 #include <amtl/am-string.h>
 
@@ -68,7 +67,7 @@ public:
 		float m_Stamp;	// for 'once' flag
 
 		bool m_Done;
-		//ForwardState m_State;
+		ForwardState m_State;
 
 		// conditions
 		struct cond_t
@@ -93,7 +92,7 @@ public:
 		//inline CPluginMngr::CPlugin* getPlugin();
 		inline void(*getFunction(int))(int);
 		void registerFilter(char* filter);			// add a condition
-		//void setForwardState(ForwardState value);
+		void setForwardState(ForwardState value);
 	};
 
 private:

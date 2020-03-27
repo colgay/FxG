@@ -1,8 +1,6 @@
-#include "PlayerHandler.h"
 #include "Player.h"
-#include <HLTypeConversion.h>
-
-extern HLTypeConversion g_TypeConversion;
+#include "PlayerHandler.h"
+#include "Utilities.h"
 
 static PlayerHandler s_PlayerHandler;
 

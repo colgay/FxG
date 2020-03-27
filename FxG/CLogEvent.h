@@ -13,6 +13,7 @@
 #define MAX_LOGARGS 12
 
 #include <stdarg.h>
+#include "AmxxApi.h"
 #include <amtl/am-vector.h>
 #include <amtl/am-string.h>
 
@@ -98,15 +99,15 @@ public:
 		LogCond* filters;
 		LogEventsMngr* parent;
 
-		//ForwardState m_State;
+		ForwardState m_State;
 
 		CLogEvent* next;
-		CLogEvent(void (*f)(void), LogEventsMngr* ppp) : func(f), filters(nullptr), parent(ppp), /*m_State(FSTATE_ACTIVE),*/ next(nullptr) {}
+		CLogEvent(void (*f)(void), LogEventsMngr* ppp) : func(f), filters(nullptr), parent(ppp), m_State(FSTATE_ACTIVE), next(nullptr) {}
 		~CLogEvent();
 	public:
 		//inline CPluginMngr::CPlugin* getPlugin() { return plugin; }
 		void registerFilter(char* filter);
-		//void setForwardState(ForwardState value);
+		void setForwardState(ForwardState value);
 		inline void(*getFunction(void))(void) { return func; }
 	};
 

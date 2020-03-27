@@ -1,12 +1,7 @@
 #include "Zombie.h"
+#include "Player.h"
 #include "Utilities.h"
-#include "AmxxApi.h"
 #include "CstrikeDatas.h"
-#include "meta_api.h"
-
-#include <HLTypeConversion.h>
-
-extern HLTypeConversion g_TypeConversion;
 
 DECLARE_PLAYER_CLASS(Zombie);
 
@@ -31,8 +26,8 @@ void Zombie::Become()
 	m_pPlayer->SetHealth(1200);
 	m_pPlayer->SetMaxHealth(m_pPlayer->GetHealth());
 	m_pPlayer->SetArmorValue(0.0f);
-	m_pPlayer->SetModel("vip", false);
 	m_pPlayer->ChangeTeam(TEAM_T, CS_DONTCHANGE);
+	m_pPlayer->SetModel("vip", false);
 	m_pPlayer->ResetMaxspeed();
 
 	UTIL_StripUserWeapons(m_pPlayer->GetEdict());
@@ -41,5 +36,5 @@ void Zombie::Become()
 
 void Zombie::SetMaxspeed()
 {
-	m_pPlayer->SetMaxSpeed(m_pPlayer->GetMaxHealth() * 1.25);
+	m_pPlayer->SetMaxSpeed(m_pPlayer->GetMaxSpeed() * 0.95);
 }

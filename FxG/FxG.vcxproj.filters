@@ -5,9 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="HamSandwich">
-      <UniqueIdentifier>{11634157-09e5-4e97-b276-32c8fe40059b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
@@ -16,36 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Hacks">
+      <UniqueIdentifier>{11634157-09e5-4e97-b276-32c8fe40059b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Trampolines.h">
-      <Filter>HamSandwich</Filter>
+      <Filter>Hacks</Filter>
     </ClInclude>
     <ClInclude Include="hooklist.h">
-      <Filter>HamSandwich</Filter>
+      <Filter>Hacks</Filter>
     </ClInclude>
     <ClInclude Include="hook_callbacks.h">
-      <Filter>HamSandwich</Filter>
+      <Filter>Hacks</Filter>
     </ClInclude>
     <ClInclude Include="hook.h">
-      <Filter>HamSandwich</Filter>
+      <Filter>Hacks</Filter>
     </ClInclude>
     <ClInclude Include="HamSandwich.h">
-      <Filter>HamSandwich</Filter>
+      <Filter>Hacks</Filter>
     </ClInclude>
     <ClInclude Include="GameMode.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="ZombieAttributes.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="AmxxApi.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="CstrikeDatas.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="ham_const.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Human.h">
@@ -84,6 +78,30 @@
     <ClInclude Include="Timer.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="GameRules.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ham_const.h">
+      <Filter>Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="InfectionMode.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Hacks.h">
+      <Filter>Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\MemoryUtils.h">
+      <Filter>Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\CDetour\detourhelpers.h">
+      <Filter>Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\CDetour\detours.h">
+      <Filter>Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\CDetour\asm\asm.h">
+      <Filter>Hacks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Human.cpp">
@@ -108,13 +126,13 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="offsets.h">
-      <Filter>HamSandwich</Filter>
+      <Filter>Hacks</Filter>
     </ClCompile>
     <ClCompile Include="config_parser.cpp">
-      <Filter>HamSandwich</Filter>
+      <Filter>Hacks</Filter>
     </ClCompile>
     <ClCompile Include="HamSandwich.cpp">
-      <Filter>HamSandwich</Filter>
+      <Filter>Hacks</Filter>
     </ClCompile>
     <ClCompile Include="AmxxApi.cpp">
       <Filter>Source</Filter>
@@ -133,6 +151,24 @@
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GameRules.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="InfectionMode.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Hacks.cpp">
+      <Filter>Hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\CDetour\asm\asm.c">
+      <Filter>Hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\CDetour\detours.cpp">
+      <Filter>Hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\MemoryUtils.cpp">
+      <Filter>Hacks</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

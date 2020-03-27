@@ -10,6 +10,7 @@
 #include "offsets.h"
 #include "hooklist.h"
 #include "hook.h"
+#include "GameRules.h"
 
 #include <amtl/am-vector.h>
 
@@ -554,6 +555,8 @@ hook_t hooklist[] =
 	{ V("sc_player_enteredobserver",Void_Void) },
 	{ V("sc_player_leftobserver",	Void_Void) },
 	{ V("sc_player_isobserver",		Bool_Void) },
+	{ V("checkwinconditions", Void_Void) },
+	{ V("gamerulesthink", Void_Void) },
 };
 
 ke::Vector<Hook*> g_Hooks[HAM_LAST_ENTRY_DONT_USE_ME_LOL];
@@ -619,6 +622,12 @@ void* GetHamFunction(void* pthis, int id)
 
 int RegisterHam(int func, const char* classname, void* targetfunc)
 {
+	if (!hooklist[func].isset)
+	{
+		MF_Log("Failed to retrieve vtable id for \"%s\".", hooklist[func].name);
+		return 0;
+	}
+
 	edict_t* pEntity = CREATE_ENTITY();
 	CALL_GAME_ENTITY(PLID, classname, &pEntity->v);
 
@@ -647,3 +656,36 @@ int RegisterHam(int func, const char* classname, void* targetfunc)
 
 	return 1;
 }
+
+int RegisterGameRules(int func, void* targetfunc)
+{
+	if (!hooklist[func].isset)
+	{
+		MF_Log("Failed to retrieve vtable id for \"%s\".", hooklist[func].name);
+		return 0;
+	}
+
+	if (g_GameRules.GetAddress() == nullptr)
+	{
+		MF_Log("Failed to retrieve address for \"GameRules\".");
+		return 0;
+	}
+
+	void** vtable = GetVTable(*g_GameRules.GetAddress(), Offsets.GetBase());
+
+	if (vtable == NULL)
+	{
+		MF_Log("Failed to retrieve vtable for \"GameRules\".");
+		return 0;
+	}
+	/*
+	int** ivtable = (int**)vtable;
+	void* vfunction = (void*)ivtable[hooklist[func].vtid];
+	*/
+
+	Hook* hook = new Hook(vtable, hooklist[func].vtid, targetfunc, hooklist[func].isvoid, hooklist[func].needsretbuf, hooklist[func].paramcount, "");
+	g_Hooks[func].append(hook);
+
+	return 1;
+}
+

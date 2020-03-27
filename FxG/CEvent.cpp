@@ -7,12 +7,10 @@
 // Additional exceptions apply. For full license details, see LICENSE.txt or visit:
 //     https://alliedmods.net/amxmodx-license
 
-#include "CEvent.h"
 #include "amxxmodule.h"
+#include "CEvent.h"
 #include "Utilities.h"
-#include "HLTypeConversion.h"
 
-extern HLTypeConversion g_TypeConversion;
 EventsMngr g_events;
 
 // *****************************************************
@@ -51,7 +49,7 @@ EventsMngr::ClEvent::ClEvent(void (*func)(int), int flags)
 
 	m_Stamp = 0.0f;
 	m_Done = false;
-	//m_State = FSTATE_ACTIVE;
+	m_State = FSTATE_ACTIVE;
 
 	m_Conditions = NULL;
 }
@@ -187,12 +185,11 @@ void EventsMngr::ClEvent::registerFilter(char* filter)
 	else
 		m_Conditions = tmpCond;
 }
-/*
+
 void EventsMngr::ClEvent::setForwardState(ForwardState state)
 {
 	m_State = state;
 }
-*/
 
 EventsMngr::ClEvent *EventsMngr::registerEvent(void(*func)(int), int flags, int msgid)
 {
@@ -459,10 +456,10 @@ void EventsMngr::executeEvents()
 
 		event->m_Stamp = *m_Timer;
 
-		//if (event->m_State == FSTATE_ACTIVE)
-		//{
-		event->m_Func(m_ReadVault ? m_ReadVault[0].iValue : 0);
-		//}
+		if (event->m_State == FSTATE_ACTIVE)
+		{
+			event->m_Func(m_ReadVault ? m_ReadVault[0].iValue : 0);
+		}
 	}
 
 	// Restore old read data, either resetting to default or to previous event data
