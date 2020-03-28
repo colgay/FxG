@@ -16,6 +16,18 @@
     <Filter Include="Hacks">
       <UniqueIdentifier>{11634157-09e5-4e97-b276-32c8fe40059b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Player Classes">
+      <UniqueIdentifier>{b9e0b5b8-63f5-4e40-a208-6336aaa8d670}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Player Classes\Survivors">
+      <UniqueIdentifier>{d4318f3c-8abe-430e-b1d0-b5999e013764}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Player Classes\Zombies">
+      <UniqueIdentifier>{6a48c13e-888d-4216-84f8-481c5823e01b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Game Modes">
+      <UniqueIdentifier>{451f04f0-2001-4664-85dd-48498e6b5519}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Trampolines.h">
@@ -104,9 +116,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Human.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Module.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -114,9 +123,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Utilities.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Zombie.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="PlayerHandler.cpp">
@@ -155,9 +161,6 @@
     <ClCompile Include="GameRules.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="InfectionMode.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Hacks.cpp">
       <Filter>Hacks</Filter>
     </ClCompile>
@@ -169,6 +172,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\MemoryUtils.cpp">
       <Filter>Hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="Human.cpp">
+      <Filter>Source\Player Classes\Survivors</Filter>
+    </ClCompile>
+    <ClCompile Include="Zombie.cpp">
+      <Filter>Source\Player Classes\Zombies</Filter>
+    </ClCompile>
+    <ClCompile Include="InfectionMode.cpp">
+      <Filter>Source\Game Modes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -32,14 +32,14 @@ void PlayerHandler::Init(int maxplayers)
 		m_pPlayers[m_maxplayers]->SetIndex(m_maxplayers + 1);
 	}
 
-	m_maxplayers++;
+	m_maxplayers--;
 }
 
 void PlayerHandler::Release()
 {
-	for (m_maxplayers; m_maxplayers > 0; --m_maxplayers)
+	for (; m_maxplayers >= 0; --m_maxplayers)
 	{
-		delete[] m_pPlayers[m_maxplayers];
+		delete m_pPlayers[m_maxplayers];
 	}
 }
 

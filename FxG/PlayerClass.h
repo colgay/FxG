@@ -1,6 +1,7 @@
 #pragma once
 
 class WrappedEntity;
+class ModifiableWrappedEntity;
 class Player;
 
 class PlayerClass
@@ -24,10 +25,10 @@ public:
 	virtual void Become() {}
 	virtual void SetMaxspeed() {}
 
-	virtual void OnRespawn() {}
+	virtual void OnSpawn() {}
 	virtual void OnThink() {}
-	virtual int OnTakeDamage(WrappedEntity* pInflictor, WrappedEntity* pAttacker, float damage, int damageType) {}
-	virtual void OnKilled(WrappedEntity* pKiller) {}
+	virtual int OnTakeDamage(ModifiableWrappedEntity* pInflictor, ModifiableWrappedEntity* pAttacker, float& damage, int& damageType) { return 0; }
+	virtual void OnKilled(ModifiableWrappedEntity* pKiller, int& shouldgib) {}
 
 protected:
 	Player* m_pPlayer;

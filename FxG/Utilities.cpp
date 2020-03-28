@@ -215,6 +215,22 @@ edict_t* UTIL_FindEntityByClassname(edict_t* pStartEntity, const char* szName)
 {
 	return UTIL_FindEntityByString(pStartEntity, "classname", szName);
 }
+
+void UTIL_Damage(edict_t* pEnt, int damageSave, int damageTake, int damageType, const Vector& coord)
+{
+	static int msgDamage = 0;
+	if (msgDamage == 0)
+		msgDamage = GET_USER_MSG_ID(PLID, "Damage", nullptr);
+
+	MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, msgDamage, nullptr, pEnt);
+	WRITE_BYTE(damageSave);
+	WRITE_BYTE(damageTake);
+	WRITE_LONG(damageType);
+	WRITE_COORD(coord[0]);
+	WRITE_COORD(coord[1]);
+	WRITE_COORD(coord[2]);
+	MESSAGE_END();
+}
 /*
 void UTIL_LogPrintf(const char* fmt, ...)
 {

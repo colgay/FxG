@@ -1,12 +1,13 @@
 #pragma once
 
 #include "extdll.h"
+#include <vector>
 #include "PlayerClass.h"
 
 class Player
 {
 public:
-	Player() : m_index(0), m_pEdict(NULL), m_pPlayerClass(nullptr)
+	Player() : m_index(0), m_pEdict(NULL), m_pPlayerClass(nullptr), m_bIsConnected(false)
 	{}
 
 	~Player();
@@ -14,6 +15,8 @@ public:
 	void PutInServer(int index);
 	bool IsAlive() const;
 	void Disconnect();
+
+	bool IsConnected(void) const { return m_bIsConnected; }
 
 	int GetCurrentWeapon() const;
 
@@ -50,6 +53,8 @@ public:
 	PlayerClass* GetClass() const { return m_pPlayerClass; }
 	PlayerClass* ChangeClass(const char* pszClassName);
 
+	void CleanRecyleBinOfClasses();
+
 private:
 	entvars_t* GetPev() { return &m_pEdict->v; }
 	const entvars_t* GetPev() const { return &m_pEdict->v; }
@@ -58,4 +63,8 @@ private:
 	int m_index;
 
 	PlayerClass* m_pPlayerClass;
+
+	bool m_bIsConnected;
+
+	std::vector<PlayerClass*> m_RecycleBinOfClasses;
 };

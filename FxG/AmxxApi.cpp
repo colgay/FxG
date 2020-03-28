@@ -11,6 +11,9 @@ int g_fwd_ResetPlayerModel;
 
 AMX_NATIVE_INFO ModuleNatives[];
 
+std::stack<int> g_ReturnState;
+std::stack<std::vector<std::any>> g_Parameters;
+
 void RegisterForwards()
 {
 	const char *path = MF_GetLocalInfo("amxx_pluginsdir", "addons/amxmodx/plugins");

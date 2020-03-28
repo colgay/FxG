@@ -8,10 +8,11 @@ public:
 	Zombie(Player* pPlayer);
 
 	virtual bool IsZombie() const override { return true; }
-	virtual void OnKnifeDeploy(WrappedEntity *pKnife);
+	virtual int OnKnifeDeploy(WrappedEntity *pKnife);
 	virtual void Become() override;
-	//virtual void OnRespawn() override;
-	//virtual void OnKilled(WrappedEntity* pKiller) override;
+	virtual void OnTouchWeapon(WrappedEntity *pWeapon);
+	virtual void OnSpawn() override;
+	//virtual void OnKilled(ModifiableWrappedEntity* pKiller, int& shouldgib) override;
 	virtual void SetMaxspeed() override;
 };
 

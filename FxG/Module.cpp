@@ -15,7 +15,7 @@
 #include "Player.h"
 #include "PlayerHandler.h"
 #include "WrappedEntity.h"
-//#include "Human.h"
+#include "Human.h"
 #include "Zombie.h"
 #include "GameRules.h"
 
@@ -38,6 +38,7 @@ int OnPlayerTakeDamage(Hook* hook, void* pthis, entvars_t* inflictor, entvars_t*
 void OnWeaponTouch(Hook* hook, void* pthis, void* pother);
 int OnKnifeDeploy(Hook* hook, void* pthis);
 void OnPlayerSpawn(Hook* hook, void* pthis);
+void OnPlayerKilled(Hook* , void* , entvars_t* , int );
 void OnPlayerResetMaxspeed(Hook* hook, void* pthis);
 void OnCheckWinConditions(Hook* hook, void* pthis);
 void OnGameRulesThink(Hook* hook, void* pthis);
@@ -78,6 +79,7 @@ void ServerActivate_Post(edict_t* pEdictList, int edictCount, int clientMax)
 	RegisterHam(Ham_Touch, "weaponbox", reinterpret_cast<void*>(OnWeaponTouch));
 	RegisterHam(Ham_Item_Deploy, "weapon_knife", reinterpret_cast<void*>(OnKnifeDeploy));
 	RegisterHam(Ham_Spawn, "player", reinterpret_cast<void*>(OnPlayerSpawn));
+	RegisterHam(Ham_Killed, "player", reinterpret_cast<void*>(OnPlayerKilled));
 	RegisterHam(Ham_CS_Player_ResetMaxSpeed, "player", reinterpret_cast<void*>(OnPlayerResetMaxspeed));
 	
 	RegisterGameRules(GR_CheckWinConditions, reinterpret_cast<void*>(OnCheckWinConditions));
@@ -86,6 +88,8 @@ void ServerActivate_Post(edict_t* pEdictList, int edictCount, int clientMax)
 	ToggleHooks(true);
 
 	g_GameRules.OnServerActivated();
+
+	RETURN_META(MRES_IGNORED);
 }
 
 void ServerDeactivate_Post()
@@ -99,6 +103,7 @@ void ServerDeactivate_Post()
 
 void OnPluginsLoaded()
 {
+	PrecacheHuman();
 	PrecacheZombie();
 
 	g_TypeConversion.init();
@@ -208,6 +213,13 @@ void ClientCommand(edict_t* pEnt)
 
 void PlayerPreThink(edict_t* pEnt)
 {
+	Player* pPlayer = GetPlayerHandler()->GetPlayer(pEnt);
+	pPlayer->CleanRecyleBinOfClasses();
+	if (pPlayer->HasClass())
+	{
+		pPlayer->GetClass()->OnThink();
+	}
+
 	RETURN_META(MRES_IGNORED);
 }
 
@@ -366,54 +378,72 @@ int DispatchSpawn(edict_t* pent)
 	return g_GameRules.OnEntitySpawn(pent);
 }
 
-int OnPlayerTakeDamage(Hook* hook, void* pthis, entvars_t* inflictor, entvars_t* attacker, float damage, int damagebits)
+BOOL OnPlayerTakeDamage(Hook* hook, void* pthis, entvars_t* inflictor, entvars_t* attacker, float damage, int damagebits)
 {
-	int origret;
+	_HAM_FUNC_BEGIN();
+
+	BOOL ret, origret;
 
 	edict_t* pPlayerEnt = g_TypeConversion.cbase_to_edict(pthis);
+
+	ModifiableWrappedEntity modifiableInflictor(g_TypeConversion.entvar_to_edict(inflictor)),
+		modifiableAttacker(g_TypeConversion.entvar_to_edict(attacker));
 
 	Player *pPlayer = GetPlayerHandler()->GetPlayer(pPlayerEnt);
 	if (pPlayer->HasClass())
 	{
-		pPlayer->GetClass()->OnTakeDamage(&WrappedEntity(g_TypeConversion.entvar_to_edict(inflictor)),
-			&WrappedEntity(g_TypeConversion.entvar_to_edict(attacker)), damage, damagebits);
+		_HAM_CALL_FUNC(pPlayer->GetClass()->OnTakeDamage(
+			&modifiableInflictor,
+			&modifiableAttacker,
+			damage, damagebits));
 	}
 
+	_HAM_CHECK_V();
+
 #if defined(_WIN32)
-	origret = reinterpret_cast<int(__fastcall*)(void*, int, entvars_t*, entvars_t*, float, int)>(hook->func)(pthis, 0, inflictor, attacker, damage, damagebits);
+	origret = reinterpret_cast<int(__fastcall*)(void*, int, entvars_t*, entvars_t*, float, int)>(hook->func)(
+		pthis, 0, modifiableInflictor.GetPev(), modifiableAttacker.GetPev(), damage, damagebits);
 #elif defined(__linux__) || defined(__APPLE__)
-	origret = reinterpret_cast<int (*)(void*, entvars_t*, entvars_t*, float, int)>(hook->func)(pthis, inflictor, attacker, damage, damagebits);
+	origret = reinterpret_cast<int (*)(void*, entvars_t*, entvars_t*, float, int)>(hook->func)(
+		pthis, modifiableInflictor.GetPev(), modifiableAttacker.GetPev(), damage, damagebits);
 #endif
 
-	return origret;
+	_HAM_FUNC_END_V();
 }
 
 
 void OnWeaponTouch(Hook* hook, void* pthis, void* pother)
 {
+	_HAM_FUNC_BEGIN();
+
 	edict_t* pEdict = g_TypeConversion.cbase_to_edict(pother);
 
 	Player* pPlayer = GetPlayerHandler()->GetPlayer(pEdict);
-	if (pPlayer != nullptr)
+	if (pPlayer != nullptr && pPlayer->HasClass())
 	{
-		if (pPlayer->HasClass() && pPlayer->GetClass()->IsZombie())
-		{
-			return;
-		}
+		Zombie *pZombie = dynamic_cast<Zombie*>(pPlayer->GetClass());
+		if (pZombie != nullptr)
+			pZombie->OnTouchWeapon(&WrappedEntity(pEdict)); // void type no need 
 	}
+
+	_HAM_CHECK();
 
 #if defined(_WIN32)
 	reinterpret_cast<void(__fastcall*)(void*, int, void*)>(hook->func)(pthis, 0, pother);
 #elif defined(__linux__) || defined(__APPLE__)
 	reinterpret_cast<void (*)(void*, void*)>(hook->func)(pthis, pother);
 #endif
+
+	_HAM_FUNC_END();
 }
 
 int OnKnifeDeploy(Hook* hook, void* pthis)
 {
-	int origret;
+	int ret, origret;
 
-	//SERVER_PRINT(UTIL_VarArgs("OnKnifeDeploy(%d)\n", g_TypeConversion.cbase_to_id(pthis)));
+	_HAM_FUNC_BEGIN();
+
+	// ...
 
 #if defined(_WIN32)
 	origret = reinterpret_cast<int(__fastcall*)(void*, int)>(hook->func)(pthis, 0);
@@ -431,22 +461,17 @@ int OnKnifeDeploy(Hook* hook, void* pthis)
 	if (pPlayer != nullptr && pPlayer->HasClass())
 	{
 		PlayerClass* pPlayerClass = pPlayer->GetClass();
-
 		// player is zombie
-		if (pPlayerClass != nullptr && pPlayerClass->IsZombie())
+		if (pPlayerClass->IsZombie())
 		{
 			// call event
 			Zombie* pZombie = dynamic_cast<Zombie*>(pPlayerClass);
 			if (pZombie != nullptr)
-				pZombie->OnKnifeDeploy(&WrappedEntity(pKnife));
+				_HAM_CALL_FUNC(pZombie->OnKnifeDeploy(&WrappedEntity(pKnife)));
 		}
 	}
-	else
-	{
-		SERVER_PRINT("Not a player\n");
-	}
 
-	return origret;
+	_HAM_FUNC_END_V();
 }
 
 void OnPlayerSpawn(Hook* hook, void* pthis)
@@ -463,10 +488,32 @@ void OnPlayerSpawn(Hook* hook, void* pthis)
 	{
 		if (GetPlayerHandler()->GetPlayer(index)->HasClass())
 		{
-			SERVER_PRINT("Player::PlayerClass::Become() called\n");
-			GetPlayerHandler()->GetPlayer(index)->GetClass()->Become();
+			GetPlayerHandler()->GetPlayer(index)->GetClass()->OnSpawn();
 		}
 	}
+}
+
+void OnPlayerKilled(Hook* hook, void* pthis, entvars_t* killer, int shouldgibs)
+{
+	_HAM_FUNC_BEGIN();
+
+	ModifiableWrappedEntity modifiableKiller(g_TypeConversion.entvar_to_edict(killer));
+
+	edict_t* pVictim = g_TypeConversion.cbase_to_edict(pthis);
+	if (GetPlayerHandler()->GetPlayer(pVictim)->HasClass())
+	{
+		GetPlayerHandler()->GetPlayer(pVictim)->GetClass()->OnKilled(&modifiableKiller, shouldgibs);
+	}
+
+	_HAM_CHECK();
+
+#if defined(_WIN32)
+	reinterpret_cast<void(__fastcall*)(void*, int, entvars_t*, int)>(hook->func)(pthis, 0, modifiableKiller.GetPev(), shouldgibs);
+#elif defined(__linux__) || defined(__APPLE__)
+	reinterpret_cast<void (*)(void*, entvars_t*, int)>(hook->func)(pthis, modifiableKiller.GetPev(), shouldgibs);
+#endif
+
+	_HAM_FUNC_END();
 }
 
 void OnPlayerResetMaxspeed(Hook* hook, void* pthis)

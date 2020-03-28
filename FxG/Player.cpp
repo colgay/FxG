@@ -19,9 +19,13 @@ Player::~Player()
 
 void Player::PutInServer(int index)
 {
+	m_bIsConnected = true;
+
 	m_index = index;
 	m_pEdict = g_TypeConversion.id_to_edict(index);
 	this->ChangeClass("Human");
+
+	//this->SetIndex(index);
 }
 
 bool Player::IsAlive() const
@@ -31,8 +35,16 @@ bool Player::IsAlive() const
 
 void Player::Disconnect()
 {
+	m_bIsConnected = false;
+
 	m_index = 0;
 	m_pEdict = NULL;
+
+	if (m_pPlayerClass != nullptr)
+	{
+		delete m_pPlayerClass;
+		m_pPlayerClass = nullptr;
+	}
 }
 
 int Player::GetCurrentWeapon() const
@@ -122,11 +134,24 @@ PlayerClass* Player::ChangeClass(const char* pszClassName)
 
 	if (m_pPlayerClass != nullptr)
 	{
-		delete m_pPlayerClass;
-		m_pPlayerClass = nullptr;
+		//delete m_pPlayerClass;
+		//m_pPlayerClass = nullptr;
+
+		m_RecycleBinOfClasses.push_back(m_pPlayerClass);
 	}
 
 	m_pPlayerClass = pHelper->Instantiate(this);
 
 	return m_pPlayerClass;
+}
+
+void Player::CleanRecyleBinOfClasses()
+{
+	for (PlayerClass*& pPlayerClass : m_RecycleBinOfClasses)
+	{
+		delete pPlayerClass;
+	}
+
+	if (m_RecycleBinOfClasses.size() > 0)
+		m_RecycleBinOfClasses.clear();
 }

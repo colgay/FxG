@@ -20,7 +20,7 @@ public:
 
 	bool IsPlayer(int index)
 	{
-		if (index >= 1 && index <= m_maxplayers)
+		if (index >= 1 && index <= GetMaxPlayers())
 			return true;
 
 		return false;
@@ -30,6 +30,8 @@ public:
 	bool HasPlayer(T key) { return GetPlayer(key) != nullptr; }
 	Player* GetPlayer(edict_t* pEnt);
 	Player* GetPlayer(int index);
+
+	int GetMaxPlayers(void) const { return m_maxplayers + 1; }
 
 private:
 	Player* m_pPlayers[MAX_PLAYERS];
