@@ -13,11 +13,19 @@ static const char* s_LeapSounds[] =
 void PrecacheHunterZombie()
 {
 	PRECACHE_MODEL("models/player/tig_zombie_hunter/tig_zombie_hunter.mdl");
+	PRECACHE_MODEL("models/tig_zombie/v_knife_hunter.mdl");
 	PRECACHE_SOUND_ARRAY(s_LeapSounds);
 }
 
 HunterZombie::HunterZombie(Player* pPlayer) : Zombie(pPlayer), m_LastLeapTime(0)
 {
+}
+
+int HunterZombie::OnKnifeDeploy(WrappedEntity* pKnife)
+{
+	m_pPlayer->GetEdict()->v.viewmodel = MAKE_STRING("models/tig_zombie/v_knife_hunter.mdl");
+	m_pPlayer->GetEdict()->v.weaponmodel = MAKE_STRING("");
+	return 1;
 }
 
 void HunterZombie::SetProperty()
