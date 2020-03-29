@@ -47,6 +47,7 @@ public:
 
 	~GameRules();
 	
+	void OnPrecache();
 	void PlayerDeathThink(void* pPlayer);
 	void OnServerActivated() { m_IsActivated = true; }
 	void Init(void** pAddr) { m_pAddress = pAddr; }

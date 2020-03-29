@@ -25,6 +25,21 @@ GameRules::~GameRules()
 	}
 }
 
+void GameRules::OnPrecache()
+{
+	edict_t *pEntity = CREATE_NAMED_ENTITY(ALLOC_STRING("info_map_parameters"));
+
+	KeyValueData kvd;
+
+	kvd.szClassName = (char*)STRING(pEntity->v.classname);
+	kvd.szKeyName = "buying";
+	kvd.szValue = "3";
+	kvd.fHandled = 0;
+
+	MDLL_KeyValue(pEntity, &kvd);
+	MDLL_Spawn(pEntity);
+}
+
 void GameRules::PlayerDeathThink(void* pPlayer)
 {
 	if (m_IsGameModeStarted)
@@ -87,10 +102,6 @@ void GameRules::OnCheckWinConditions(void *pGameRules)
 
 	GET_OFFSET("CHalfLifeMultiplay", m_bFirstConnected, offsetConnected);
 
-	SERVER_PRINT(UTIL_VarArgs("m_iRoundWinStatus = %d, m_bFirstConnected = %s",
-		get_pdata<int32>(pGameRules, offsetWinStatus),
-		get_pdata<bool>(pGameRules, offsetConnected) ? "true" : "false"));
-
 	if (get_pdata<bool>(pGameRules, offsetConnected) && get_pdata<int32>(pGameRules, offsetWinStatus) != WINSTATUS_NONE)
 		return;
 
@@ -103,8 +114,6 @@ void GameRules::OnCheckWinConditions(void *pGameRules)
 
 	int numSpawnableT = get_pdata<int32>(pGameRules, offsetSpawnableT);
 	int numSpawnableCt = get_pdata<int32>(pGameRules, offsetSpawnableCt);
-
-	SERVER_PRINT(UTIL_VarArgs("m_iNumSpawnableTerrorist = %d, m_iNumSpawnableCT = %d", numSpawnableT, numSpawnableCt));
 
 	m_NeededPlayers = false;
 	if (numSpawnableT + numSpawnableCt < 3)

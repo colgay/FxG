@@ -58,6 +58,8 @@ void OnAmxxAttach()
 	{
 		MF_Log("Error: Cannot read config file!");
 	}
+
+	RegisterNatives();
 }
 
 
@@ -105,6 +107,7 @@ void OnPluginsLoaded()
 {
 	PrecacheHuman();
 	PrecacheZombie();
+	g_GameRules.OnPrecache();
 
 	g_TypeConversion.init();
 
@@ -375,14 +378,12 @@ void OnNewRound(int msg)
 
 int DispatchSpawn(edict_t* pent)
 {
-	return g_GameRules.OnEntitySpawn(pent);
+	RETURN_META_VALUE(MRES_IGNORED, g_GameRules.OnEntitySpawn(pent));
 }
 
-BOOL OnPlayerTakeDamage(Hook* hook, void* pthis, entvars_t* inflictor, entvars_t* attacker, float damage, int damagebits)
+int OnPlayerTakeDamage(Hook* hook, void* pthis, entvars_t* inflictor, entvars_t* attacker, float damage, int damagebits)
 {
-	_HAM_FUNC_BEGIN();
-
-	BOOL ret, origret;
+	_FUNC_BEGIN_V(int, 0, MRES_UNSET);
 
 	edict_t* pPlayerEnt = g_TypeConversion.cbase_to_edict(pthis);
 
@@ -392,29 +393,32 @@ BOOL OnPlayerTakeDamage(Hook* hook, void* pthis, entvars_t* inflictor, entvars_t
 	Player *pPlayer = GetPlayerHandler()->GetPlayer(pPlayerEnt);
 	if (pPlayer->HasClass())
 	{
-		_HAM_CALL_FUNC(pPlayer->GetClass()->OnTakeDamage(
+		_CALL_FUNC(pPlayer->GetClass()->OnTakeDamage(
 			&modifiableInflictor,
 			&modifiableAttacker,
 			damage, damagebits));
 	}
 
-	_HAM_CHECK_V();
+	_FUNC_CHECK_STATE()
+	{
+		_RETURN_FUNC_END_V();
+	}
 
 #if defined(_WIN32)
-	origret = reinterpret_cast<int(__fastcall*)(void*, int, entvars_t*, entvars_t*, float, int)>(hook->func)(
+	_FUNC_ORIG_RET = reinterpret_cast<int(__fastcall*)(void*, int, entvars_t*, entvars_t*, float, int)>(hook->func)(
 		pthis, 0, modifiableInflictor.GetPev(), modifiableAttacker.GetPev(), damage, damagebits);
 #elif defined(__linux__) || defined(__APPLE__)
-	origret = reinterpret_cast<int (*)(void*, entvars_t*, entvars_t*, float, int)>(hook->func)(
+	_FUNC_ORIG_RET = reinterpret_cast<int (*)(void*, entvars_t*, entvars_t*, float, int)>(hook->func)(
 		pthis, modifiableInflictor.GetPev(), modifiableAttacker.GetPev(), damage, damagebits);
 #endif
 
-	_HAM_FUNC_END_V();
+	_RETURN_FUNC_END_V();
 }
 
 
 void OnWeaponTouch(Hook* hook, void* pthis, void* pother)
 {
-	_HAM_FUNC_BEGIN();
+	_FUNC_BEGIN(MRES_UNSET);
 
 	edict_t* pEdict = g_TypeConversion.cbase_to_edict(pother);
 
@@ -426,7 +430,10 @@ void OnWeaponTouch(Hook* hook, void* pthis, void* pother)
 			pZombie->OnTouchWeapon(&WrappedEntity(pEdict)); // void type no need 
 	}
 
-	_HAM_CHECK();
+	_FUNC_CHECK_STATE()
+	{
+		_RETURN_FUNC_END();
+	}
 
 #if defined(_WIN32)
 	reinterpret_cast<void(__fastcall*)(void*, int, void*)>(hook->func)(pthis, 0, pother);
@@ -434,21 +441,19 @@ void OnWeaponTouch(Hook* hook, void* pthis, void* pother)
 	reinterpret_cast<void (*)(void*, void*)>(hook->func)(pthis, pother);
 #endif
 
-	_HAM_FUNC_END();
+	_RETURN_FUNC_END();
 }
 
 int OnKnifeDeploy(Hook* hook, void* pthis)
 {
-	int ret, origret;
-
-	_HAM_FUNC_BEGIN();
+	_FUNC_BEGIN_V(int, 0, MRES_UNSET);
 
 	// ...
 
 #if defined(_WIN32)
-	origret = reinterpret_cast<int(__fastcall*)(void*, int)>(hook->func)(pthis, 0);
+	_FUNC_ORIG_RET = reinterpret_cast<int(__fastcall*)(void*, int)>(hook->func)(pthis, 0);
 #elif defined(__linux__) || defined(__APPLE__)
-	origret = reinterpret_cast<int (*)(void*)>(hook->func)(pthis);
+	_FUNC_ORIG_RET = reinterpret_cast<int (*)(void*)>(hook->func)(pthis);
 #endif
 
 	GET_OFFSET("CBasePlayerItem", m_pPlayer, offsetPlayer);
@@ -467,11 +472,11 @@ int OnKnifeDeploy(Hook* hook, void* pthis)
 			// call event
 			Zombie* pZombie = dynamic_cast<Zombie*>(pPlayerClass);
 			if (pZombie != nullptr)
-				_HAM_CALL_FUNC(pZombie->OnKnifeDeploy(&WrappedEntity(pKnife)));
+				_CALL_FUNC(pZombie->OnKnifeDeploy(&WrappedEntity(pKnife)));
 		}
 	}
 
-	_HAM_FUNC_END_V();
+	_RETURN_FUNC_END_V();
 }
 
 void OnPlayerSpawn(Hook* hook, void* pthis)
@@ -495,7 +500,7 @@ void OnPlayerSpawn(Hook* hook, void* pthis)
 
 void OnPlayerKilled(Hook* hook, void* pthis, entvars_t* killer, int shouldgibs)
 {
-	_HAM_FUNC_BEGIN();
+	_FUNC_BEGIN(MRES_UNSET);
 
 	ModifiableWrappedEntity modifiableKiller(g_TypeConversion.entvar_to_edict(killer));
 
@@ -505,7 +510,10 @@ void OnPlayerKilled(Hook* hook, void* pthis, entvars_t* killer, int shouldgibs)
 		GetPlayerHandler()->GetPlayer(pVictim)->GetClass()->OnKilled(&modifiableKiller, shouldgibs);
 	}
 
-	_HAM_CHECK();
+	_FUNC_CHECK_STATE()
+	{
+		_RETURN_FUNC_END();
+	}
 
 #if defined(_WIN32)
 	reinterpret_cast<void(__fastcall*)(void*, int, entvars_t*, int)>(hook->func)(pthis, 0, modifiableKiller.GetPev(), shouldgibs);
@@ -513,7 +521,7 @@ void OnPlayerKilled(Hook* hook, void* pthis, entvars_t* killer, int shouldgibs)
 	reinterpret_cast<void (*)(void*, entvars_t*, int)>(hook->func)(pthis, modifiableKiller.GetPev(), shouldgibs);
 #endif
 
-	_HAM_FUNC_END();
+	_RETURN_FUNC_END();
 }
 
 void OnPlayerResetMaxspeed(Hook* hook, void* pthis)
@@ -547,6 +555,35 @@ void OnGameRulesThink(Hook* hook, void* pthis)
 #elif defined(__linux__) || defined(__APPLE__)
 	reinterpret_cast<void (*)(void*)>(hook->func)(pthis);
 #endif
+}
+
+void EmitSound(edict_t* entity, int channel, const char* sample, /*int*/float volume, float attenuation, int fFlags, int pitch)
+{
+	_FUNC_BEGIN(MRES_IGNORED);
+
+	Player* pPlayer = GetPlayerHandler()->GetPlayer(entity);
+	if (pPlayer != nullptr && pPlayer->HasClass())
+	{
+		if (strlen(sample) > 7 && strncmp(sample + 7, "bhit", 4) == 0)
+		{
+			pPlayer->GetClass()->OnPainSound(channel);
+		}
+		else if (strlen(sample) > 14 && strncmp(sample + 8, "knife", 5) == 0)
+		{
+			char type[16];
+			strcpy(type, (sample + 14));
+			type[strlen(type) - 4] = '\0';
+
+			pPlayer->GetClass()->OnKnifeSound(channel, type);
+		}
+		else if (strncmp(sample + 7, "die", 3) == 0 || strncmp(sample + 7, "death", 5) == 0)
+		{
+			pPlayer->GetClass()->OnDieSound(channel);
+		}
+	}
+
+	SERVER_PRINT(UTIL_VarArgs("STATE = %d, ", _FUNC_STATE));
+	_RETURN_META_END();
 }
 
 void StartFrame_Post(void)

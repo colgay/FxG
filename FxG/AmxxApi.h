@@ -5,132 +5,65 @@
 #include <any>
 #include "ham_const.h"
 
-extern std::stack<int> g_ReturnState;
+extern std::stack<META_RES> g_ReturnState;
 
-// colgate
+#define _FUNC_BEGIN(res) \
+	g_ReturnState.push(res);
 
-#if 0
+#define _FUNC_BEGIN_V(type, value, res) \
+	type __ret = value, __origret = value, __tmpret = value; \
+	g_ReturnState.push(res);
 
-inline void __FUNC_BEGIN()
-{
-	g_ReturnState.push(HAM_IGNORED);
-}
-
-inline int __RESULT() { return g_ReturnState.top(); }
-
-inline void __SET_HAM_STATE(int state)
-{
-	if (state > __RESULT())
-	{
-		__RESULT() = state;
-		//return;
-	}
-}
-
-/*inline std::any __RETURN_VALUE(int state, std::any &ret)
-{
-	if (state > std::any_cast<int>(__RETURN_RESULT))
-	{
-		__RETURN_RESULT() = state;
-		return ret;
-	}
-}*/
-
-inline void __CALL_FUNC(func)
-{
-	if (std::any_cast<int>(__RETURN_RESULT) >= HAM_OVERRIDE) {
-		\
-			ret = func;								\
-	}
-	else {
-		\
-			func;									\
-	}
-}
-
-#define __POP() \
-	g_Parameters.pop();
-
-#define __CHECK_SUPERCEDE()		\
-	if (std::any_cast<int>(__RETURN_RESULT) >= HAM_SUPERCEDE) { \
-		__POP();								\
-		return;									\
-	}
-
-#define __CHECK_SUPERCEDE_VALUE()		\
-	if (std::any_cast<int>(__RETURN_RESULT) >= HAM_SUPERCEDE) { \
-		__POP();								\
-		return ret;								\
-	}
-
-#define __END_FUNC()	\
-	__POP();			\
-	return;
-
-#define __END_FUNC_VALUE(ret, origret)	\
-	if (std::any_cast<int>(__RETURN_RESULT) >= HAM_OVERRIDE) {	\
-		__POP();								\
-		return ret;								\
-	} else {									\
-		__POP();								\
-		return origret;							\
-	}
-
-// original
-
-#else
-
-#define _HAM_FUNC_BEGIN() \
-	g_ReturnState.push(HAM_UNSET); \
-
-#define _HAM_GET_STATE() \
+#define _FUNC_STATE \
 	g_ReturnState.top()
 
-#define _RETURN_HAM(state) \
-	if (state > _HAM_GET_STATE()) { \
-		_HAM_GET_STATE() = state;	\
-		return;	\
+#define _FUNC_ORIG_RET \
+	 __origret
+
+#define _RETURN_STATE(state) \
+	if (state > _FUNC_STATE) {	\
+		_FUNC_STATE = state;		\
+		return;						\
 	}
 
-#define _RETURN_HAM_V(state) \
-	if (state > _HAM_GET_STATE()) { \
-		_HAM_GET_STATE() = state;	\
-		return ret\
+#define _RETURN_STATE_V(state, value) \
+	if (state > _FUNC_STATE) { \
+		_FUNC_STATE = state;	  \
+		return value;			  \
 	}
 
-#define _HAM_CALL_FUNC(func) \
-	if (_HAM_GET_STATE() >= HAM_OVERRIDE) {	\
-		ret = func;								\
-	} else { \
-		func; \
+#define _CALL_FUNC(func) \
+	__tmpret = func; \
+	if (_FUNC_STATE >= MRES_OVERRIDE) { \
+		__ret = __tmpret; \
 	}
 
-#define _HAM_CHECK()		\
-	if (_HAM_GET_STATE() >= HAM_SUPERCEDE) { \
-		g_ReturnState.pop();					\
-		return;									\
+#define _CHECK_RESULT() \
+	if (_FUNC_STATE < MRES_OVERRIDE) { \
+		__ret = __origret;	\
 	}
 
-#define _HAM_CHECK_V()		\
-	if (_HAM_GET_STATE() >= HAM_SUPERCEDE) { \
-		g_ReturnState.pop();						\
-		return ret;								\
-	}
-
-#define _HAM_FUNC_END()	\
+#define _RETURN_FUNC_END() \
 	g_ReturnState.pop(); \
 	return;
 
-#define _HAM_FUNC_END_V()	\
-	if (_HAM_GET_STATE() >= HAM_OVERRIDE) {	\
-		g_ReturnState.pop();								\
-		return ret;								\
-	} else {									\
-		g_ReturnState.pop();								\
-		return origret;							\
-	}
+#define _RETURN_FUNC_END_V() \
+	_CHECK_RESULT(); \
+	g_ReturnState.pop(); \
+	return __ret;
+
+#define _RETURN_META_END() \
+	META_RES __fuckyouon9jai__ = _FUNC_STATE; \
+	g_ReturnState.pop(); \
+	RETURN_META(__fuckyouon9jai__);
+
+#define _RETURN_META_END_V() \
+	META_RES __fuckyouon9jai__ = _FUNC_STATE; \
+	_CHECK_RESULT(); \
+	g_ReturnState.pop(); \
+	RETURN_META_VALUE(__fuckyouon9jai__, __ret);
 	
-#endif
+#define _FUNC_CHECK_STATE() if (_FUNC_STATE >= MRES_SUPERCEDE)
 	
 enum ForwardState
 {

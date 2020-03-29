@@ -242,7 +242,7 @@
 // #define FN_DropToFloor						DropToFloor
 // #define FN_WalkMove							WalkMove
 // #define FN_SetOrigin							SetOrigin
-// #define FN_EmitSound							EmitSound
+#define FN_EmitSound							EmitSound
 // #define FN_EmitAmbientSound					EmitAmbientSound
 // #define FN_TraceLine							TraceLine
 // #define FN_TraceToss							TraceToss

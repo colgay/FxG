@@ -103,7 +103,7 @@ void Human::CleanPoisoning()
 
 void Human::PoisoningHurt()
 {
-	if (gpGlobals->time >= m_LastCoughTime + 3.0)
+	if (gpGlobals->time >= m_LastCoughTime + 4.0)
 	{
 		UTIL_Damage(m_pPlayer->GetEdict(), 0, 1, DMG_NERVEGAS, Vector());
 

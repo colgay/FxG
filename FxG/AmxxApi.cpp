@@ -11,8 +11,7 @@ int g_fwd_ResetPlayerModel;
 
 AMX_NATIVE_INFO ModuleNatives[];
 
-std::stack<int> g_ReturnState;
-std::stack<std::vector<std::any>> g_Parameters;
+std::stack<META_RES> g_ReturnState;
 
 void RegisterForwards()
 {
@@ -54,7 +53,7 @@ static cell AMX_NATIVE_CALL tig_is_player_zombie(AMX* amx, cell* params)
 	}
 
 	Player* pPlayer = GetPlayerHandler()->GetPlayer(playerIndex);
-	if (pPlayer->HasClass())
+	if (!pPlayer->HasClass())
 	{
 		MF_LogError(amx, AMX_ERR_NATIVE, "player (%d) has no class", playerIndex);
 		return 0;

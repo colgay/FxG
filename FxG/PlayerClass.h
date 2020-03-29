@@ -27,6 +27,11 @@ public:
 
 	virtual void OnSpawn() {}
 	virtual void OnThink() {}
+
+	virtual void OnPainSound(int channel) {}
+	virtual void OnKnifeSound(int channel, const char* pszName) {}
+	virtual void OnDieSound(int channel) {}
+
 	virtual int OnTakeDamage(ModifiableWrappedEntity* pInflictor, ModifiableWrappedEntity* pAttacker, float& damage, int& damageType) { return 0; }
 	virtual void OnKilled(ModifiableWrappedEntity* pKiller, int& shouldgib) {}
 
