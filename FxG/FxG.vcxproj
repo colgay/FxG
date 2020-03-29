@@ -159,6 +159,8 @@
     <ClCompile Include="CEvent.cpp" />
     <ClCompile Include="CLogEvent.cpp" />
     <ClCompile Include="config_parser.cpp" />
+    <ClCompile Include="FastZombie.cpp" />
+    <ClCompile Include="FatZombie.cpp" />
     <ClCompile Include="GameMode.cpp" />
     <ClCompile Include="GameRules.cpp" />
     <ClCompile Include="Hacks.cpp" />
@@ -200,6 +202,8 @@
     <ClInclude Include="CEvent.h" />
     <ClInclude Include="CLogEvent.h" />
     <ClInclude Include="CstrikeDatas.h" />
+    <ClInclude Include="FastZombie.h" />
+    <ClInclude Include="FatZombie.h" />
     <ClInclude Include="GameMode.h" />
     <ClInclude Include="GameRules.h" />
     <ClInclude Include="Hacks.h" />
@@ -221,6 +225,7 @@
     <ClInclude Include="sdk\moduleconfig.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="Zombie.h" />
+    <ClInclude Include="ZombieAttributes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

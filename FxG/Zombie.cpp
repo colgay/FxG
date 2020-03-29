@@ -1,10 +1,15 @@
 #include "Zombie.h"
+
+#include <algorithm>
+
 #include "Player.h"
 #include "meta_api.h"
 #include "Utilities.h"
 #include "CstrikeDatas.h"
 #include "AmxxApi.h"
 
+#include "FastZombie.h"
+#include "FatZombie.h"
 #include "HunterZombie.h"
 
 DECLARE_PLAYER_CLASS(Zombie);
@@ -48,6 +53,12 @@ static const char* s_DieSounds[] =
 	"tig_zombie/die/male/death_49.wav",
 };
 
+static std::vector<std::pair<std::string, ZombieAttributes>>& ZombieClassVector()
+{
+	static std::vector<std::pair<std::string, ZombieAttributes>> v;
+	return v;
+}
+
 void PrecacheZombie()
 {
 	PRECACHE_MODEL("models/player/tig_zombie_headcrab/tig_zombie_headcrab.mdl");
@@ -61,11 +72,15 @@ void PrecacheZombie()
 	PRECACHE_SOUND_ARRAY(s_DieSounds);
 	PRECACHE_SOUND(s_KnifeHitWallSound);
 
+	PrecacheFastZombie();
+	PrecacheFatZombie();
 	PrecacheHunterZombie();
 }
 
-Zombie::Zombie(Player* pPlayer) : PlayerClass(pPlayer), m_LastPainTime(0), m_NextIdleSoundTime(0)
+Zombie::Zombie(Player* pPlayer) : PlayerClass(pPlayer)
 {
+	m_LastPainTime = 0;
+	m_NextIdleSoundTime = 0;
 }
 
 int Zombie::OnKnifeDeploy(WrappedEntity* pKnife)
@@ -77,6 +92,15 @@ int Zombie::OnKnifeDeploy(WrappedEntity* pKnife)
 
 void Zombie::Become()
 {
+	int index = m_pPlayer->GetNextZombieClass();
+	if (index >= 0 && m_pPlayer->GetClassName() == "Zombie")
+	{
+		// Become() is included
+		m_pPlayer->ChangeClass(ZombieClassVector().at(index).first.c_str());
+		m_pPlayer->GetClass()->Become();
+		return; // stop here
+	}
+
 	m_pPlayer->ChangeTeam(TEAM_T, CS_DONTCHANGE);
 	UTIL_StripUserWeapons(m_pPlayer->GetEdict());
 	UTIL_GiveItem(m_pPlayer->GetEdict(), "weapon_knife");
@@ -161,4 +185,14 @@ void Zombie::SetProperty()
 	m_pPlayer->SetArmorValue(0.0f);
 	m_pPlayer->SetModel("tig_zombie_headcrab", false);
 	m_pPlayer->ResetMaxspeed();
+}
+
+const std::vector<std::pair<std::string, ZombieAttributes>>& GetZombieClassVector()
+{
+	return ZombieClassVector();
+}
+
+ZombieClassHelper::ZombieClassHelper(const char* pszName, const ZombieAttributes& attributes)
+{
+	ZombieClassVector().push_back(std::make_pair(pszName, attributes));
 }

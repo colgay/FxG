@@ -2,11 +2,14 @@
 
 #include "amxxmodule.h"
 
+#include "hook.h"
 #include "offsets.h"
 #include "CstrikeDatas.h"
 #include "HamSandwich.h"
 #include "AmxxApi.h"
 #include "Utilities.h"
+
+void OnPlayerResetMaxspeed(Hook* hook, void* pthis);
 
 Player::~Player()
 {
@@ -113,14 +116,10 @@ void Player::ResetModel()
 
 void Player::ResetMaxspeed()
 {
-	void *pv = g_TypeConversion.id_to_cbase(m_index);
-	void* pFunc = GetHamFunction(pv, Ham_CS_Player_ResetMaxSpeed);
-
-#if defined(_WIN32)
-	reinterpret_cast<void(__fastcall*)(void*, int)>(pFunc)(pv, 0);
-#elif defined(__linux__) || defined(__APPLE__)
-	reinterpret_cast<void (*)(void*)>(pFunc)(pv);
-#endif
+	if (g_Hooks[Ham_CS_Player_ResetMaxSpeed].length() > 0)
+	{
+		OnPlayerResetMaxspeed(g_Hooks[Ham_CS_Player_ResetMaxSpeed].back(), g_TypeConversion.id_to_cbase(m_index));
+	}
 }
 
 PlayerClass* Player::ChangeClass(const char* pszClassName)
@@ -140,6 +139,7 @@ PlayerClass* Player::ChangeClass(const char* pszClassName)
 		m_RecycleBinOfClasses.push_back(m_pPlayerClass);
 	}
 
+	m_ClassName = pszClassName;
 	m_pPlayerClass = pHelper->Instantiate(this);
 
 	return m_pPlayerClass;

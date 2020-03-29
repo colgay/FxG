@@ -1,6 +1,10 @@
 #pragma once
 
 #include "PlayerClass.h"
+#include "ZombieAttributes.h"
+
+#include <vector>
+#include <string>
 
 class Zombie : public PlayerClass
 {
@@ -27,3 +31,15 @@ private:
 };
 
 void PrecacheZombie();
+
+#define DECLARE_ZOMBIE_CLASS(classname, attr) \
+	DECLARE_PLAYER_CLASS(classname); \
+	static ZombieClassHelper __s_ZombieClassHelper(#classname, attr);
+
+class ZombieClassHelper
+{
+public:
+	ZombieClassHelper(const char* pszName, const ZombieAttributes& attributes);
+};
+
+const std::vector<std::pair<std::string, ZombieAttributes>>& GetZombieClassVector();

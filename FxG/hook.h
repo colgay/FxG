@@ -47,24 +47,27 @@ public:
 		int** ivtable = (int**)vtable;
 		func = (void*)ivtable[entry];
 
-		// now install a trampoline
-		// (int thiscall, int voidcall, int paramcount, void *extraptr)
-		tramp = CreateGenericTrampoline(true, voidcall, retbuf, paramcount, (void*)this, target, &trampSize);
+		if (target != nullptr)
+		{
+			// now install a trampoline
+			// (int thiscall, int voidcall, int paramcount, void *extraptr)
+			tramp = CreateGenericTrampoline(true, voidcall, retbuf, paramcount, (void*)this, target, &trampSize);
 
-		// Insert into vtable
+			// Insert into vtable
 #if defined(_WIN32)
-		DWORD OldFlags;
-		VirtualProtect(&ivtable[entry], sizeof(int*), PAGE_READWRITE, &OldFlags);
+			DWORD OldFlags;
+			VirtualProtect(&ivtable[entry], sizeof(int*), PAGE_READWRITE, &OldFlags);
 #elif defined(__linux__) || defined(__APPLE__)
-		void* addr = (void*)ALIGN(&ivtable[entry]);
-		mprotect(addr, sysconf(_SC_PAGESIZE), PROT_READ | PROT_WRITE);
+			void* addr = (void*)ALIGN(&ivtable[entry]);
+			mprotect(addr, sysconf(_SC_PAGESIZE), PROT_READ | PROT_WRITE);
 #endif
-		ivtable[entry] = (int*)tramp;
+			ivtable[entry] = (int*)tramp;
 
-		size_t len = strlen(name);
-		ent = new char[len + 1];
+			size_t len = strlen(name);
+			ent = new char[len + 1];
 
-		ke::SafeSprintf(ent, len + 1, "%s", name);
+			ke::SafeSprintf(ent, len + 1, "%s", name);
+		}
 	};
 
 	~Hook()

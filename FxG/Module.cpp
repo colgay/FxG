@@ -24,7 +24,7 @@
 
 OffsetManager Offsets;
 
-extern ke::Vector<Hook*> g_Hooks[HAM_LAST_ENTRY_DONT_USE_ME_LOL];
+//extern ke::Vector<Hook*> g_Hooks[HAM_LAST_ENTRY_DONT_USE_ME_LOL];
 
 //std::map<std::string, BasePlayerClassHelper*> g_PlayerClassHelpers;
 //std::map<std::string, BaseGameModeHelper*> g_GameModeHelpers;

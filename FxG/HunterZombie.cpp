@@ -2,7 +2,16 @@
 #include "Player.h"
 #include "meta_api.h"
 
-DECLARE_PLAYER_CLASS(HunterZombie);
+static const ZombieAttributes s_ZombieAttributes{
+	"Hunter", // name
+	"Leap", // desc
+	750, // health
+	230, // maxspeed
+	0.5f, // gravity
+	2.0f, // knockback
+};
+
+DECLARE_ZOMBIE_CLASS(HunterZombie, s_ZombieAttributes);
 
 static const char* s_LeapSounds[] =
 {
@@ -30,8 +39,8 @@ int HunterZombie::OnKnifeDeploy(WrappedEntity* pKnife)
 
 void HunterZombie::SetProperty()
 {
-	m_pPlayer->SetGravity(0.5f);
-	m_pPlayer->SetHealth(700);
+	m_pPlayer->SetGravity(s_ZombieAttributes.gravity);
+	m_pPlayer->SetHealth(s_ZombieAttributes.health);
 	m_pPlayer->SetMaxHealth(m_pPlayer->GetHealth());
 	m_pPlayer->SetArmorValue(0.0f);
 	m_pPlayer->SetModel("tig_zombie_hunter", false);
@@ -77,7 +86,7 @@ void HunterZombie::OnThink()
 
 void HunterZombie::SetMaxspeed()
 {
-	m_pPlayer->SetMaxSpeed(m_pPlayer->GetMaxSpeed() * 0.95);
+	m_pPlayer->SetMaxSpeed(s_ZombieAttributes.maxspeed);
 }
 
 bool HunterZombie::IsTouchedWall()

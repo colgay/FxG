@@ -117,6 +117,15 @@
     <ClInclude Include="HunterZombie.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="ZombieAttributes.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="FastZombie.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="FatZombie.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Module.cpp">
@@ -186,6 +195,12 @@
       <Filter>Source\Game Modes</Filter>
     </ClCompile>
     <ClCompile Include="HunterZombie.cpp">
+      <Filter>Source\Player Classes\Zombies</Filter>
+    </ClCompile>
+    <ClCompile Include="FastZombie.cpp">
+      <Filter>Source\Player Classes\Zombies</Filter>
+    </ClCompile>
+    <ClCompile Include="FatZombie.cpp">
       <Filter>Source\Player Classes\Zombies</Filter>
     </ClCompile>
   </ItemGroup>

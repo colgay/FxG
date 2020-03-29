@@ -2,13 +2,20 @@
 
 #include "extdll.h"
 #include <vector>
+#include <string>
 #include "PlayerClass.h"
 
 class Player
 {
 public:
-	Player() : m_index(0), m_pEdict(NULL), m_pPlayerClass(nullptr), m_bIsConnected(false)
-	{}
+	Player()
+	{
+		m_index = 0;
+		m_pEdict = NULL;
+		m_pPlayerClass = nullptr;
+		m_bIsConnected = false;
+		m_NextZombieClassId = -1;
+	}
 
 	~Player();
 
@@ -66,8 +73,13 @@ public:
 	void ResetMaxspeed();
 	
 	bool HasClass() const { return (GetClass() != nullptr); }
+	const std::string &GetClassName() const { return m_ClassName; }
+
 	PlayerClass* GetClass() const { return m_pPlayerClass; }
 	PlayerClass* ChangeClass(const char* pszClassName);
+
+	int GetNextZombieClass() const { return m_NextZombieClassId; }
+	void SetNextZombieClass(int index) { m_NextZombieClassId = index; }
 
 	void CleanRecyleBinOfClasses();
 
@@ -79,6 +91,9 @@ private:
 	int m_index;
 
 	PlayerClass* m_pPlayerClass;
+	std::string m_ClassName;
+
+	int m_NextZombieClassId;
 
 	bool m_bIsConnected;
 
