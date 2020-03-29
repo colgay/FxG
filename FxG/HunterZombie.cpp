@@ -22,7 +22,7 @@ HunterZombie::HunterZombie(Player* pPlayer) : Zombie(pPlayer), m_LastLeapTime(0)
 
 void HunterZombie::SetProperty()
 {
-	m_pPlayer->SetGravity(0.55f);
+	m_pPlayer->SetGravity(0.5f);
 	m_pPlayer->SetHealth(700);
 	m_pPlayer->SetMaxHealth(m_pPlayer->GetHealth());
 	m_pPlayer->SetArmorValue(0.0f);
@@ -32,20 +32,32 @@ void HunterZombie::SetProperty()
 
 void HunterZombie::OnThink()
 {
-	if ((m_pPlayer->GetButton() & IN_DUCK) && (m_pPlayer->GetButton() & IN_JUMP))
+	if ((m_pPlayer->GetButton() & IN_DUCK) && (m_pPlayer->GetButton() & IN_JUMP) && !(m_pPlayer->GetOldButton() & IN_JUMP))
 	{
-		if (((m_pPlayer->GetFlags() & FL_ONGROUND) && (gpGlobals->time >= m_LastLeapTime + 1.5)) ||
-			(this->IsTouchedWall() && (gpGlobals->time >= m_LastLeapTime + 0.5)))
+		bool isOnGround = (m_pPlayer->GetFlags() & FL_ONGROUND);
+		bool isTouched = this->IsTouchedWall();
+
+		if ((isOnGround && gpGlobals->time >= m_LastLeapTime + 1.5f) || (!isOnGround && isTouched && gpGlobals->time >= m_LastLeapTime + 0.5f))
 		{
 			Vector velocity = m_pPlayer->GetVelocity();
 			Vector angle = m_pPlayer->GetViewAngle();
 
-			if (angle.x > -25.0)
-				angle.x = -25.0;
+			if (isOnGround && angle.x > -25.0f)
+				angle.x = -25.0f;
 
 			MAKE_VECTORS(angle);
 
-			velocity = velocity + gpGlobals->v_forward * 450.0f;
+			if (isOnGround)
+			{
+				velocity = velocity + gpGlobals->v_forward * 450.0f;
+				velocity = this->TruncateLength(velocity, 450.0f); // quick speed fix
+			}
+			else
+			{
+				velocity = velocity + gpGlobals->v_forward * 500.0f;
+				velocity = this->TruncateLength(velocity, 500.0f); // quick speed fix
+			}
+
 			m_pPlayer->SetVelocity(velocity);
 
 			EMIT_SOUND_DYN2(m_pPlayer->GetEdict(), CHAN_VOICE, RANDOM_SOUND_ARRAY(s_LeapSounds), VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
@@ -82,4 +94,16 @@ bool HunterZombie::IsTouchedWall()
 		return true;
 
 	return false;
+}
+
+Vector HunterZombie::TruncateLength(const Vector& vec, float maxLength)
+{
+	float f;
+	f = maxLength / vec.Length2D();
+	f = f < 1.0f ? f : 1.0f;
+
+	Vector v = vec * f;
+	v.z = vec.z;
+
+	return v;
 }

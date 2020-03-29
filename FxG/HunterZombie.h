@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Zombie.h"
+#include "extdll.h"
 
 class HunterZombie : public Zombie
 {
@@ -10,7 +11,8 @@ public:
 	virtual void SetProperty() override;
 	virtual void OnThink() override;
 	virtual void SetMaxspeed() override;
-	virtual bool IsTouchedWall();
+	bool IsTouchedWall();
+	Vector TruncateLength(const Vector& vec, float maxLength);
 
 private:
 	float m_LastLeapTime;
