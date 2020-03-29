@@ -176,7 +176,31 @@ void ClientCommand(edict_t* pEnt)
 			}
 			else
 			{
-				UTIL_ClientPrintAll(HUD_PRINTTALK, "PlayerClass is nullptr");
+				UTIL_ClientPrintAll(HUD_PRINTTALK, "PlayerClass is nullptr\n");
+			}
+		}
+		else
+		{
+			UTIL_ClientPrintAll(HUD_PRINTTALK, "Player not found.\n");
+		}
+
+		RETURN_META(MRES_SUPERCEDE);
+	}
+	else if (strcmp(pszCmd, "testhunter") == 0)
+	{
+		// how to become a zombie?
+		Player* pPlayer = GetPlayerHandler()->GetPlayer(pEnt);
+		if (pPlayer != nullptr)
+		{
+			PlayerClass* pPlayerClass = pPlayer->ChangeClass("HunterZombie");
+			if (pPlayerClass != nullptr)
+			{
+				pPlayerClass->Become();
+				UTIL_ClientPrintAll(HUD_PRINTTALK, UTIL_VarArgs("testhunter: IsZombie(): %s\n", (pPlayerClass->IsZombie() ? "true" : "false")));
+			}
+			else
+			{
+				UTIL_ClientPrintAll(HUD_PRINTTALK, "PlayerClass is nullptr\n");
 			}
 		}
 		else
@@ -196,11 +220,11 @@ void ClientCommand(edict_t* pEnt)
 			if (pPlayerClass != nullptr)
 			{
 				pPlayerClass->Become();
-				UTIL_ClientPrintAll(HUD_PRINTTALK, UTIL_VarArgs("testzombie: IsZombie(): %s\n", (pPlayerClass->IsZombie() ? "true" : "false")));
+				UTIL_ClientPrintAll(HUD_PRINTTALK, UTIL_VarArgs("testhuman: IsZombie(): %s\n", (pPlayerClass->IsZombie() ? "true" : "false")));
 			}
 			else
 			{
-				UTIL_ClientPrintAll(HUD_PRINTTALK, "PlayerClass is nullptr");
+				UTIL_ClientPrintAll(HUD_PRINTTALK, "PlayerClass is nullptr\n");
 			}
 		}
 		else
@@ -535,9 +559,9 @@ void OnPlayerResetMaxspeed(Hook* hook, void* pthis)
 	int index = g_TypeConversion.cbase_to_id(pthis);
 	if (MF_IsPlayerIngame(index) && MF_IsPlayerAlive(index))
 	{
-		// maybe OnPlayerResetMaxSpeed is before PutInServer
-		if (GetPlayerHandler()->GetPlayer(index)->HasClass())
-			GetPlayerHandler()->GetPlayer(index)->GetClass()->SetMaxspeed();
+		Player* pPlayer = GetPlayerHandler()->GetPlayer(index);
+		if (pPlayer->HasClass())
+			pPlayer->GetClass()->SetMaxspeed();
 	}
 }
 
@@ -582,7 +606,7 @@ void EmitSound(edict_t* entity, int channel, const char* sample, /*int*/float vo
 		}
 	}
 
-	SERVER_PRINT(UTIL_VarArgs("STATE = %d, ", _FUNC_STATE));
+	//SERVER_PRINT(UTIL_VarArgs("STATE = %d, ", _FUNC_STATE));
 	_RETURN_META_END();
 }
 

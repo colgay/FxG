@@ -19,6 +19,7 @@ public:
 	virtual void OnIdleSound();
 	//virtual void OnKilled(ModifiableWrappedEntity* pKiller, int& shouldgib) override;
 	virtual void SetMaxspeed() override;
+	virtual void SetProperty() override;
 
 private:
 	float m_LastPainTime;

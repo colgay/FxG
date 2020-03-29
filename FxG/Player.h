@@ -41,6 +41,22 @@ public:
 	float GetMaxSpeed() const { return GetPev()->maxspeed; }
 	void SetMaxSpeed(float maxspeed) { GetPev()->maxspeed = maxspeed; }
 
+	int GetButton() const { return GetPev()->button; }
+	void SetButton(int button) { GetPev()->button = button; }
+
+	int GetOldButton() const { return GetPev()->oldbuttons; }
+	void SetOldButton(int button) { GetPev()->oldbuttons = button; }
+
+	int GetFlags() const { return GetPev()->flags; }
+	void SetFlags(int flags) { GetPev()->flags = flags; }
+
+	Vector GetVelocity() const { return GetPev()->velocity; }
+	void SetVelocity(const Vector& vel) { GetPev()->velocity = vel; }
+
+	Vector GetViewAngle() const { return GetPev()->v_angle; }
+
+	Vector GetOrigin() const { return GetPev()->origin; }
+
 	int GetTeam() const;
 	void ChangeTeam(int team, int model, bool send_teaminfo = true);
 

@@ -163,6 +163,7 @@
     <ClCompile Include="GameRules.cpp" />
     <ClCompile Include="Hacks.cpp" />
     <ClCompile Include="HamSandwich.cpp" />
+    <ClCompile Include="HunterZombie.cpp" />
     <ClCompile Include="InfectionMode.cpp" />
     <ClCompile Include="offsets.h" />
     <ClCompile Include="Human.cpp">
@@ -208,6 +209,7 @@
     <ClInclude Include="hooklist.h" />
     <ClInclude Include="hook_callbacks.h" />
     <ClInclude Include="Human.h" />
+    <ClInclude Include="HunterZombie.h" />
     <ClInclude Include="InfectionMode.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerClass.h" />

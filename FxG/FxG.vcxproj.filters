@@ -114,6 +114,9 @@
     <ClInclude Include="..\..\..\..\..\..\SDK\amxmodx\public\memtools\CDetour\asm\asm.h">
       <Filter>Hacks</Filter>
     </ClInclude>
+    <ClInclude Include="HunterZombie.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Module.cpp">
@@ -181,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="InfectionMode.cpp">
       <Filter>Source\Game Modes</Filter>
+    </ClCompile>
+    <ClCompile Include="HunterZombie.cpp">
+      <Filter>Source\Player Classes\Zombies</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

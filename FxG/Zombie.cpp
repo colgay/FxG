@@ -5,6 +5,8 @@
 #include "CstrikeDatas.h"
 #include "AmxxApi.h"
 
+#include "HunterZombie.h"
+
 DECLARE_PLAYER_CLASS(Zombie);
 
 static const char* s_IdleSounds[] =
@@ -58,6 +60,8 @@ void PrecacheZombie()
 	PRECACHE_SOUND_ARRAY(s_KnifeMissSounds);
 	PRECACHE_SOUND_ARRAY(s_DieSounds);
 	PRECACHE_SOUND(s_KnifeHitWallSound);
+
+	PrecacheHunterZombie();
 }
 
 Zombie::Zombie(Player* pPlayer) : PlayerClass(pPlayer), m_LastPainTime(0), m_NextIdleSoundTime(0)
@@ -73,18 +77,13 @@ int Zombie::OnKnifeDeploy(WrappedEntity* pKnife)
 
 void Zombie::Become()
 {
-	m_pPlayer->SetGravity(0.95f);
-	m_pPlayer->SetHealth(1200);
-	m_pPlayer->SetMaxHealth(m_pPlayer->GetHealth());
-	m_pPlayer->SetArmorValue(0.0f);
 	m_pPlayer->ChangeTeam(TEAM_T, CS_DONTCHANGE);
-	m_pPlayer->SetModel("tig_zombie_headcrab", false);
-	m_pPlayer->ResetMaxspeed();
-
 	UTIL_StripUserWeapons(m_pPlayer->GetEdict());
 	UTIL_GiveItem(m_pPlayer->GetEdict(), "weapon_knife");
 
 	m_NextIdleSoundTime = gpGlobals->time;
+
+	this->SetProperty();
 }
 
 void Zombie::OnTouchWeapon(WrappedEntity* pWeapon)
@@ -152,4 +151,14 @@ void Zombie::OnIdleSound()
 void Zombie::SetMaxspeed()
 {
 	m_pPlayer->SetMaxSpeed(m_pPlayer->GetMaxSpeed() * 0.95);
+}
+
+void Zombie::SetProperty()
+{
+	m_pPlayer->SetGravity(0.95f);
+	m_pPlayer->SetHealth(1200);
+	m_pPlayer->SetMaxHealth(m_pPlayer->GetHealth());
+	m_pPlayer->SetArmorValue(0.0f);
+	m_pPlayer->SetModel("tig_zombie_headcrab", false);
+	m_pPlayer->ResetMaxspeed();
 }

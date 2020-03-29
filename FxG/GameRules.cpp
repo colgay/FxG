@@ -318,10 +318,9 @@ void GameRules::OnGameCountDown(Timer* pTimer)
 	//GameRules* pGameRules = std::any_cast<GameRules*>(params[0]);
 
 	int& count = std::any_cast<int&>(params[0]);
+	count--;
 	if (count > 0)
 	{
-		count--;
-
 		if (count <= 10)
 		{
 			char word[32];
@@ -351,7 +350,7 @@ void GameRules::OnGameCountDown(Timer* pTimer)
 		textparms.fadeoutTime = 0.5;
 		textparms.channel = 1;
 
-		UTIL_HudMessageAll(textparms, UTIL_VarArgs("Covid-19 coronavirus is spreading (%d)...", count));
+		UTIL_HudMessageAll(textparms, UTIL_VarArgs("Covid-19 coronavirus is spreading from china (%d)...", count));
 	}
 	else
 	{

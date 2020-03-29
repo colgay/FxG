@@ -23,6 +23,7 @@ public:
 	virtual bool IsLeader() const { return false; }
 
 	virtual void Become() {}
+	virtual void SetProperty() {}
 	virtual void SetMaxspeed() {}
 
 	virtual void OnSpawn() {}
